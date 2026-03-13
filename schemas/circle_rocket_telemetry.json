@@ -1,0 +1,121 @@
+{
+  "data_map": [
+    {
+      "label": "Mission Time",
+      "mapping": null,
+      "source_key": "timestamp",
+      "type": "float",
+      "unit": "s",
+      "visualizers": {
+        "show_in_terminal": true,
+        "stats": ["min", "max", "mean"],
+        "time_series": true
+      }
+    },
+    {
+      "label": "Altitude",
+      "mapping": "z_axis",
+      "source_key": "alt",
+      "type": "float",
+      "unit": "m",
+      "visualizers": {
+        "show_in_terminal": true,
+        "stats": ["min", "max", "mean"],
+        "time_series": true
+      }
+    },
+    {
+      "label": "Position X",
+      "mapping": "x_axis",
+      "source_key": "position.x",
+      "type": "float",
+      "unit": "m",
+      "visualizers": {
+        "show_in_terminal": true,
+        "stats": ["min", "max", "mean"],
+        "time_series": true
+      }
+    },
+    {
+      "label": "Position Y",
+      "mapping": "y_axis",
+      "source_key": "position.y",
+      "type": "float",
+      "unit": "m",
+      "visualizers": {
+        "show_in_terminal": true,
+        "stats": ["min", "max", "mean"],
+        "time_series": true
+      }
+    },
+    {
+      "label": "Position Z",
+      "mapping": "z_axis",
+      "source_key": "position.z",
+      "type": "float",
+      "unit": "m",
+      "visualizers": {
+        "show_in_terminal": true,
+        "stats": ["min", "max", "mean"],
+        "time_series": true
+      }
+    },
+    {
+      "label": "Quaternion X",
+      "mapping": "orientation",
+      "source_key": "quaternion.x",
+      "type": "float",
+      "unit": "",
+      "visualizers": {
+        "show_in_terminal": false,
+        "stats": [],
+        "time_series": false
+      }
+    },
+    {
+      "label": "Quaternion Y",
+      "mapping": "orientation",
+      "source_key": "quaternion.y",
+      "type": "float",
+      "unit": "",
+      "visualizers": {
+        "show_in_terminal": false,
+        "stats": [],
+        "time_series": false
+      }
+    },
+    {
+      "label": "Quaternion Z",
+      "mapping": "orientation",
+      "source_key": "quaternion.z",
+      "type": "float",
+      "unit": "",
+      "visualizers": {
+        "show_in_terminal": false,
+        "stats": [],
+        "time_series": false
+      }
+    },
+    {
+      "label": "Quaternion W",
+      "mapping": "orientation",
+      "source_key": "quaternion.w",
+      "type": "float",
+      "unit": "",
+      "visualizers": {
+        "show_in_terminal": false,
+        "stats": [],
+        "time_series": false
+      }
+    }
+  ],
+  "features": {
+    "enable_3d_view": true,
+    "enable_map_view": false,
+    "enable_terminal": true
+  },
+  "mission_metadata": {
+    "name": "Circle_Rocket_Telemetry",
+    "vessel_id": "CIRCLE-01"
+  }
+}

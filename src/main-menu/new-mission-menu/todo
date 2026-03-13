@@ -1,0 +1,42 @@
+multi tab view allows us to have multiple tabs open at the same time
+
+need to keep track of which ports used and available so a list of web sockets to maintain
+
+keep track of status of missions, in progress, completed, closed abruptly
+in progress means the socket is still connected
+completed means we succesfuly finished and exited the run
+closed abruptly means the program closed/exited out
+
+if its in progress we can go back and press live view to continue, hard part will be reloading all the information that was being logged
+or mapping the in progress to an existing data buffer / index in memory
+
+MOST IMPORTANT
+
+FOCUS:
+on startup need to make sure that a file exists for the program to check:
+- check for saves folder with missions just like minecraft it will contain a folder with saved information from a run
+- another folder with saved schemas and the note
+- settings file so we can use existing settings/changes that were made
+- has to be done in rust, then pass this onto the frontend so it knows
+- create a schema for these
+
+FOCUS:
+manage data schemas is a way for users to upload data schemas and manage them
+- also later build an editor so they can edit these schemas and save them -> rust code
+when they create a new mission they can load a saved schema or they can upload a new one and edit
+- editor should be its own component so we can do view/edit in both the create new and here
+
+
+FOCUS:
+create new
+- need a mission name (name of the save)
+- save path (backend needs to store this location) <-- will use default path for now, will not deal with multiple folders for now
+- select a saved schema the backend is using
+- save data
+- save data freq
+- field to add notes for the launch (weather, location, members, issues, to tests)
+- display the ip and port to connect to, only allow to proceed once a backend has been connected
+- then we reuse the existing dashboard code that needs to be refactored
+- once we end the mission we clear the data and save it all
+
+- ask user if they are providing trajectory data or not ( this can be in their own backend but wont touch this for now)
