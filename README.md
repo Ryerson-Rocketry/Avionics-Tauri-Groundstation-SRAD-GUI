@@ -1,168 +1,145 @@
-# ROCKET VIEW
 
-A desktop mission control application for real-time rocket telemetry visualization. RocketView connects to an external WebSocket server streaming telemetry data and renders it as a live 3D scene, charts, statistics, and a raw data terminal. It also supports recording missions to disk and replaying them later.
+<a id="readme-top"></a>
 
-Built with **Tauri v2** (Rust backend) + **React 19** + **Vite 7** + **Three.js**.
+<div align="center">
+  <a href="https://github.com/rackman404/TBA">
+	<img src="_Documentation/Images/gitdocs/readme_top.png" alt="Logo" width="80" height="80">
+  </a>
 
----
+  <h1 align="center">Avionics SRAD Ground Station</h3>
+   <h3 align="center">Version: V0.1</h3>
 
-## Samples
+  <p align="center">
+     Custom SRAD GUI for 2025-2026, Successor GUI to <a href="https://github.com/Ryerson-Rocketry/Groundstation-GUI-Electron">Avionics GUI Used 2024-2025</a>.
+    <br />
+    <a href="https://github.com/TBA/TBA/tree/main/_Documentation"><strong>See Main Documentation »</strong></a>
+    <a href="https://github.com/TBA/TBA/tree/main/_Documentation"><strong>See User Manual »</strong></a>
+    <br />
+  </p>
+</div>
 
-### Batman Theme
 
-| Manage Schemas | Replays |
-|:-:|:-:|
-| ![Batman Theme - Manage](samples/batmanThemeManage.png) | ![Batman Theme - Replays](samples/batmanThemeReplays.png) |
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#overview">Overview</a> </li>
+    <li><a href="#telemetry">Telemetry</a> </li>
+	<li><a href="#built-with">Built With</a></li>
+    <li><a href="#getting-started-development">Getting Started (Development)</a></li>
+    <li><a href="#documentation">Documentation</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#attributions-and-acknowledgements">Attributions and Acknowledgments</a></li>
+  </ol>
+</details>
 
-### Retro Theme
 
-| Manage Schemas | Replays |
-|:-:|:-:|
-| ![Retro Theme - Manage](samples/retroThemeManage.png) | ![Retro Theme - Replays](samples/retroThemeReplays.png) |
+# Overview
 
-### Demo Video
+![preview](_Documentation/Images/preview_v0_1_0.png)
+<sub>Preview - Version V0.1 - 2026-05-08</sub>
 
-A sample video walkthrough is available at [`samples/samplevideo.mp4`](samples/samplevideo.mp4).
+<video src="_Documentation/Videos/long_demo_v_0_1_0.webm" controls></video> 
+<sub>Long Demo (Using Test Launch Data) - Version V0.1 - 2026-05-08 (See other demos in _Documentation/Videos)</sub>
 
----
+### Purpose
+Desktop application specifically for displaying both raw and parsed telemetry data transmitted from Avionics' specific onboard firmware. Overall application comprises the Tauri built application as well as a Python webserver for receiving data from a connected radio.
 
-## Features
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### New Mission
-- Enter a mission name and launch notes (weather, crew, conditions, etc.)
-- Select a telemetry schema from previously saved schemas
-- Toggle saving mission data to disk for later replay
-- Configure the WebSocket server IP and port (default `127.0.0.1:8765`)
-- Connect with an 8-second timeout and launch directly into the live dashboard
-- Inline schema preview to verify field mappings before launch
 
-### Live Telemetry Dashboard
-- **3D Visualization** -- Real-time rocket model with quaternion-based orientation, labeled local axes (X/Y/Z), and a flame effect rendered with React Three Fiber
-- **Launch Platform** -- Procedurally generated terrain with wireframe overlay and N/S/E/W compass labels
-- **Height Landmarks** -- Animated scale reference objects (car at 1.5 m, house at 10 m, airplane at 100 m, CN Tower at 553 m)
-- **Trajectory Line** -- Color-coded by speed (HSL gradient from blue to red) with a dashed white prediction line based on current velocity and gravity
-- **Camera Controls** -- Smooth lock-on tracking mode or free orbit / keyboard controls (WASD + QE) with a zoom slider
-- **Altitude Chart** -- Recharts line chart of altitude over time with configurable update intervals (0.25 s, 0.5 s, 1 s, 2 s)
-- **Descriptive Statistics** -- Real-time min, max, mean, and median for altitude and velocity
-- **GPS Recovery Map** -- Optional Leaflet map with auto-recentering marker (enabled per schema)
-- **Terminal Panel** -- Scrolling raw telemetry log showing fields configured with `show_in_terminal` in the schema
-- **Header Bar** -- Connection status indicator, mission name, live altitude/velocity/mission-time readouts, camera lock toggle, and exit button
+# Telemetry 
 
-### Mission Recording & Replay
-- During a live session, incoming WebSocket packets are buffered and flushed to disk every 3 seconds as numbered CSV part files via the Rust backend
-- On exit, part files are merged into a single `telemetry.csv` with updated metadata
-- Replay dashboard reuses all live panels (3D, chart, stats, terminal) driven by a timeline scrubber
-- Playback controls: play/pause, seek, and speed adjustment (0.25x to 4x)
+To provide data to the GUI, a Python Webserver with serial port access is used (a connected radio receiver should be used in conjunction with this). At this time only hardcoded data that is required is supported
+- Note: Will include custom data mapping (via a specified schema) later
 
-### Replays Archive
-- Lists all saved mission recordings as cards with mission name, date, and notes
-- Search bar and sortable filter columns (Name, Created, Notes, Action)
-- One-click replay or delete (with confirmation dialog)
+General Flow is from CSV string received from the Webserver which is then parsed into a JSON object for use in the GUI itself. The CSV string can be parsed either using headers received from radio or on a positional basis (via. position of element in csv string)
 
-### Manage Telemetry Data Schemas
-- Full CRUD interface for telemetry schemas displayed as a card grid
-- **Create new schemas** with an interactive builder:
-  - Identity section: schema name and vessel ID
-  - Core modules: toggle 3D Attitude Visualizer, Recovery Map, and System Terminal
-  - Telemetry mapping: dynamic field list where each field defines a source key, display label, data type, unit, system mapping (axis, orientation, GPS, etc.), and per-field visualizer/statistics toggles
-- **Upload JSON** to import an existing schema file
-- **Raw JSON editor** as an alternative to the visual builder
-- **Configure** existing schemas or **delete** them
+## Supported Telemetry Data
+### Hardcoded Data
 
-### Settings
-- Theme selector with 6 built-in themes and persistent save to disk
-- Displays the current schema repository path and mission archive path (stored in OS AppData)
+| Data            | Radio (Header/Position) -> Webserver JSON Mapping | Webserver -> Tauri JSON Mapping | Data Type | Data Vis                      |
+| --------------- | ------------------------------------------------- | ------------------------------- | --------- | ----------------------------- |
+| Latitude        | latitude -> x                                     |                                 | Number    | 2D Map                        |
+| Longitude       | longitude -> z                                    |                                 | Number    | 2D Map                        |
+| Altitude        | altitude -> y                                     |                                 | Number    | 2D Map<br>3D Map<br>Graph     |
+| Pressure        | pressure ->                                       |                                 | Number    | Numerical Statistics<br>Graph |
+| Temperature     | temperature -> temp                               |                                 | Number    | Numerical Statistics<br>Graph |
+| Battery Voltage | battery_voltage -> battVolt                       |                                 | Number    | Numerical Statistics          |
+| Main Voltage    | main_voltage -> mainVolt                          |                                 | Number    | Numerical Statistics          |
+| Drogue Voltage  | drogue_voltage -> drogVolt                        |                                 | Number    | Numerical Statistics          |
+| Velocity        | speed -> vel                                      |                                 | Number    | Numerical Statistics<br>Graph |
+| Acceleration    | acceleration -> acceleration                      |                                 | Number    | Numerical Statistics<br>Graph |
+| State           | state_name -> state                               |                                 | String    | Top Mission Display           |
+| Time            | time -> timestamp                                 |                                 | Number    | Graph                         |
 
-### Themes
+## Telemetry View Modules
 
-RocketView ships with 6 themes, each with unique component styles:
+| Module               | Position                                                        | Description                                                                                                                                                                                                                   | Data Supported                                                                                                 |
+| -------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Graph                | Altitude<br>Velocity<br>Acceleration<br>Pressure<br>Temperature | Shows all data points recorded on graphs. Has option for single graph view, all graph view, or full screen graph views.<br><br>Note: For scaling, custom y axis domain may be switched on (datamin, datamax) or to auto scale | Altitude<br>Velocity<br>Acceleration<br>Pressure<br>Temperature                                                |
+| Numerical Statistics | Right                                                           | By default, shows current value, max, min, and mean. If expanded, will show Standard Deviation and Variance. May also show uni                                                                                                | Altitude<br>Velocity<br>Acceleration<br>Pressure<br>Temperature<br>Voltage (Battery, Main, Drogue)<br><br><br> |
+| 2D Map               | Left                                                            | Shows current rocket position on a 2D map using Leaflet. May switch between satellite view and normal view                                                                                                                    | Latitude<br>Longitude                                                                                          |
+| 3D Map               | Left                                                            | (EXPERIMENTAL) Shows current rocket position, may be performance heavy                                                                                                                                                        | Latitude<br>Longitude<br>Altitude                                                                              |
 
-| Theme | Description |
-|-------|-------------|
-| Dark | Default sci-fi dark theme |
-| Light | Light variant |
-| Retro | Retro-styled aesthetic |
-| 8-Bit | Pixel art inspired |
-| Minecraft | Minecraft-inspired |
-| Batman | Dark Knight theme |
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Background Effects
-- Animated starfield with 600 twinkling stars (randomized size, position, opacity, and animation timing)
-- Animated ship elements that fly across the screen
+# Built With
 
----
+### Main Desktop Tech Stack
+* [![Tech Stack Badge](https://img.shields.io/badge/Tauri-blue?style=for-the-badge&logo=tauri&logoColor=61DAFB)](https://www.electronjs.org) - Application/Backend Framework
+	* [![Tech Stack Badge](https://img.shields.io/badge/React-blue?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev) - Frontend Library/Framework
+		* [![Tech Stack Badge](https://img.shields.io/badge/Three.JS-red?style=for-the-badge&logo=javascript&logoColor=61DAFB)](https://mui.com) - 3D Library
+		* [![Tech Stack Badge](https://img.shields.io/badge/Recharts.js-red?style=for-the-badge&logo=javascript&logoColor=61DAFB)](https://mui.com) - Graph Library
+		*  [![Tech Stack Badge](https://img.shields.io/badge/leaflet-red?style=for-the-badge&logo=leaflet&logoColor=61DAFB)](https://mui.com) - Mapping Library
 
-## Telemetry Schema
 
-Telemetry schemas define how incoming JSON packets are parsed and mapped to the dashboard's visualizers. A sample schema is available in the [`schemas/`](schemas/) folder.
+### Python Webserver Sub Process Tech Stack
+* [![Tech Stack Badge](https://img.shields.io/badge/Pyinstaller-blue?style=for-the-badge&logo=python&logoColor=61DAFB)](https://www.electronjs.org) - Python Standalone Binary Builder
+	* [![Tech Stack Badge](https://img.shields.io/badge/Pyserial-blue?style=for-the-badge&logo=python&logoColor=61DAFB)](https://react.dev) - Serial Communication Library
+	* [![Tech Stack Badge](https://img.shields.io/badge/Websockets-red?style=for-the-badge&logo=python&logoColor=61DAFB)](https://mui.com) - Web Server Library
 
-The sample [`circle_rocket_telemetry.json`](schemas/circle_rocket_telemetry.json) maps 9 fields including mission time, altitude, 3D position (X/Y/Z), and quaternion orientation (X/Y/Z/W). Each field specifies:
 
-- `source_key` -- the JSON path in incoming telemetry packets (e.g. `position.x`, `quaternion.w`)
-- `label` -- human-readable display name
-- `type` -- data type (`float`, `int`, `string`, `bool`, `quaternion`, `gps_coord`)
-- `unit` -- measurement unit (`m`, `s`, `m/s`, `deg`, `Pa`, etc.)
-- `mapping` -- system mapping (`x_axis`, `y_axis`, `z_axis`, `orientation`, `latitude`, `longitude`, or `null`)
-- `visualizers` -- per-field toggles for terminal output, time-series chart, and statistics (min, max, mean, median, var, std)
+### Languages
+* [![Tech Stack Badge](https://img.shields.io/badge/javascript-green?style=for-the-badge&logo=javascript&logoColor=61DAFB)](https://www.typescriptlang.org/) 
+* [![Tech Stack Badge](https://img.shields.io/badge/Rust-green?style=for-the-badge&logo=rust&logoColor=61DAFB)]([https://rust-lang.org/](https://rust-lang.org/)) 
+* [![Tech Stack Badge](https://img.shields.io/badge/Python-green?style=for-the-badge&logo=python&logoColor=61DAFB)]([https://rust-lang.org/](https://rust-lang.org/)) 
 
-The schema also defines top-level `features` (3D view, map view, terminal) and `mission_metadata` (name, vessel ID). Use the built-in schema manager to create, edit, upload, and delete schemas from within the app.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
----
 
-## Tech Stack
+# Getting Started (Development)
 
-| Layer | Technology |
-|-------|------------|
-| Desktop framework | Tauri v2 |
-| Backend | Rust (serde, chrono, local-ip-address) |
-| Frontend | React 19 |
-| Build tool | Vite 7 |
-| 3D rendering | Three.js + React Three Fiber + Drei |
-| Charts | Recharts |
-| Maps | Leaflet + react-leaflet |
-| Fonts | Orbitron (headings), Google Sans (body) |
+TBD
+### Requirements  
+- Cargo (Rust package manager)
+- Python
+- Git
 
----
+### Installation (Windows 10/11)
 
-## Getting Started
+TBD 
 
-### Prerequisites
+For more detailed instructions, see [Documentation (Link to Markdown README in Documentation Folder)](_Documentation/README.md)
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-- [Node.js](https://nodejs.org/)
-- [Rust](https://www.rust-lang.org/tools/install)
-- [Tauri v2 prerequisites](https://v2.tauri.app/start/prerequisites/)
+# Documentation
 
-### Installation
+(TBD)
 
-```bash
-npm install
-```
+This project uses [Obsidian](https://obsidian.md) for Markdown file editing. Most documentation for this project is included with the "\_Documentation" folder. Documentation is either in Markdown for text or Draw.io files for diagrams (can be downloaded and imported into Draw.io to read or directly opened in VSCode using extensions). Note that documentation may not always be up to date. All documentation can be found in the \_Documentation folder in this repo.
 
-### Development
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```bash
-npm run tauri dev
-```
+# License
 
-Or use the included batch file:
+N/A
 
-```bash
-run_tauri.bat
-```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-The Vite dev server starts on port 1420 and Tauri wraps it in a native window.
+# Attributions And Acknowledgements
+### Acknowledgements
+- [Michael Czomko](https://github.com/AlphaCloudX) - Did the vast majority of the GUI in March 2026. Project forked from his original repo [here](https://github.com/AlphaCloudX/Aerial-Vehicle-Telemetry-Dashboard). 
 
-### Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
-
----
-
-## Data Storage
-
-RocketView stores data in the OS AppData directory:
-
-- **Windows**: `%APPDATA%/com.michael.rocketview/`
-  - `schemas/` -- saved telemetry schema JSON files
-  - `saves/` -- recorded mission folders (each containing `save.json`, `schema.json`, and `telemetry.csv`)
-  - `settings.json` -- persisted app settings (theme, etc.)
+## Attributions
+- ESRI - Free GIS provider (used for satellite view in this software)
+- OSM - Open Source Map Provider
