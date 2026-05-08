@@ -1,0 +1,64 @@
+.dashboardRightExpanded {
+    height: 85vh; 
+    grid-column: 2;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    /*
+    border-color: aqua;
+    border-style: dashed;
+    */
+    gap: "1.2vh";
+}
+
+.dashboardRightNormal {
+    height: 70vh; 
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    /*
+    border-color: aqua;
+    border-style: dashed;
+    */
+    gap: "1.2vh";
+}
+
+.dashboardLeftNormal {
+    height: 70vh; 
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    /*
+    border-color: aqua;
+    border-style: dashed;
+    */
+    gap: "1.2vh";
+}
+
+.dashboardLeftExpanded {
+    height: 70vh; 
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    /*
+    border-color: aqua;
+    border-style: dashed;
+    */
+    gap: "1.2vh";
+}
+
+.dashboardGrid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1.2fr 1fr;
+    /*
+    border-color: aqua;
+    border-style: dashed;
+    */
+    gap: 1.2vh 1.2vw;
+    overflow: hidden;
+}

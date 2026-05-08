@@ -1,0 +1,8 @@
+
+
+/*implement animation stuff later*/
+@keyframes slide-in {
+    100% {
+        transform: translateY(0%)
+    }
+}
