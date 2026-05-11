@@ -207,7 +207,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
     drogueVolt: [],
   })
 
-
+  const [socketOBJ, setSocketOBJ] = useState(undefined);
 
   const [consoleLogs, setConsoleLogs] = useState([]);
 
@@ -282,8 +282,10 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
 
   const [lastCloseReason, setLastCloseReason] = useState(null);
 
+  //KNOWN ISSUE: WILL CREATE A WEBSOCKET CONNECTION, END IT, THEN CREATE ANOTHER ONE (THAT ACTUALLY FUNCTIONS)
+  //moved to separate useffect with no deps so it only creates socket once
   useEffect(() => {
-    if (!isLive || !socketUrl) return;
+    console.log("INITING SOCKET");
 
     let url = socketUrl;
     if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
@@ -293,11 +295,60 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
     let socket;
 
     try {
+      //socketOBJ?.close(); //in case prev socket was never closed
       socket = new WebSocket(url);
+
+      
+      setSocketOBJ (socket);
+
+      
+      
+      socket.onopen = () => {
+        //set mode on server
+        console.log("SOCKET CREATED");
+        socket.send("demo");
+
+        setLastCloseReason(null);
+      };
+
+      socket.onerror = (ev) => {
+        console.error("[RocketView] WebSocket error:", ev);
+        setLastCloseReason("Connection error");
+      };
+
+      socket.onclose = (ev) => {
+        const msg = `code ${ev.code}${ev.reason ? `: ${ev.reason}` : ""} (${describeCloseCode(ev.code)})`;
+        console.error("[RocketView] WebSocket closed:", msg);
+        setLastCloseReason(msg);
+        setTelemetry((t) => ({ ...t, status: "DISCONNECTED" }));
+      };
+
+
     } catch (e) {
       console.error("❌ Failed to open telemetry socket:", e);
       return;
     }
+
+    return () => {
+      if (socket){
+        console.log("DISCONNECTING FROM SOCKET");
+        socket.close();
+
+      }     
+    }
+    
+
+  }, []);
+
+  useEffect(() => {
+    if (!isLive || !socketUrl || socketOBJ == undefined) return;
+
+    let url = socketUrl;
+    if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
+      url = `ws://${url}`;
+    }
+
+    let socket = socketOBJ;
 
     socket.onmessage = (event) => {
       try {
@@ -480,28 +531,15 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
       flushIntervalId = setInterval(flushRecording, RECORDING_FLUSH_INTERVAL_MS);
     }
 
-    socket.onopen = () => {
-      setLastCloseReason(null);
-    };
 
-    socket.onerror = (ev) => {
-      console.error("[RocketView] WebSocket error:", ev);
-      setLastCloseReason("Connection error");
-    };
-
-    socket.onclose = (ev) => {
-      const msg = `code ${ev.code}${ev.reason ? `: ${ev.reason}` : ""} (${describeCloseCode(ev.code)})`;
-      console.error("[RocketView] WebSocket closed:", msg);
-      setLastCloseReason(msg);
-      setTelemetry((t) => ({ ...t, status: "DISCONNECTED" }));
-    };
 
     return () => {
       if (flushIntervalId) clearInterval(flushIntervalId);
       flushRecording();
-      if (socket) socket.close();
+      //moved to new use effect hook
+      //if (socket) socket.close();
     };
-  }, [isLive, socketUrl, flushRecording]);
+  }, [isLive, socketUrl, flushRecording, socketOBJ]);
 
   return {
     telemetry,

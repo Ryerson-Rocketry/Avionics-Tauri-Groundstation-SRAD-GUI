@@ -1,11 +1,68 @@
 // Prevents additional console window on Windows in release, do not remove.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::sync::{Arc, Mutex};
+use tauri_plugin_shell::ShellExt;
+use tauri_plugin_shell::process::{CommandChild, CommandEvent};
+use tauri::Emitter;
+use tauri::{Builder, Manager};
+
+
 // Import your new module
 mod state_manager;
 
+//const sidecar_command = app.shell().sidecar("webserver").unwrap();
+//const (mut rx, mut child) = sidecar_command
+//  .spawn()
+//  .expect("Failed to spawn sidecar");
+
+struct Webserver {
+  child: &'static str,
+}
+
+
+
+
+
 fn main() {
     tauri::Builder::default()
+        .setup(|app| {
+
+            let sidecar_command = app.shell().sidecar("webserver_proc").unwrap();
+            let ( _rx, sidecar_child) = sidecar_command
+                .spawn()
+                .expect("Failed to spawn sidecar");
+
+            // Wrap the child process in Arc<Mutex<>> for shared access
+            let child = Arc::new(Mutex::new(Some(sidecar_child)));
+
+            // Clone the Arc to move into the async task
+            let child_clone = Arc::clone(&child);
+
+
+            let window = app.get_webview_window("main").unwrap();
+
+            window.on_window_event( move |event| {
+                if let tauri::WindowEvent::CloseRequested { .. } = event {
+
+                let mut child_lock = child_clone.lock().unwrap();
+                if let Some(mut child_process) = child_lock.take() {
+                    if let Err(e) = child_process.write("Exit message from Rust".as_bytes())
+                    {
+                    println!("Fail to send to stdin of Python: {}", e);
+                    }
+
+                    if let Err(e) = child_process.kill() {
+                        eprintln!("Failed to kill child process: {}", e);
+                    }
+                }
+                }
+            });
+
+            Ok(())
+
+        })
+        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             state_manager::initialize_app,
             state_manager::save_schema,
@@ -21,4 +78,5 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
 }

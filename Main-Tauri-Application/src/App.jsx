@@ -7,12 +7,20 @@ import { ErrorBoundary } from "./components/ErrorBoundary.jsx";
 import { ThemeProvider } from "./styles/ThemeContext.jsx";
 import "./App.css";
 
+import { Command } from '@tauri-apps/plugin-shell';
+import { resolveResource } from '@tauri-apps/api/path';
+
+
+
+
 function App() {
   const [appConfig, setAppConfig] = useState(null);
   const [error, setError] = useState(null);
   const [activeView, setActiveView] = useState("main"); // 'main' | 'telemetry' | 'replay'
   const [activeMission, setActiveMission] = useState(null);
   const [activeReplaySave, setActiveReplaySave] = useState(null);
+
+
 
   const refreshAppConfig = async () => {
     try {
@@ -33,7 +41,17 @@ function App() {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => {  
+    const sidecarSetup = async () => {
+      console.log("STARTING PYTHON WEBSERVER");
+      const command = Command.sidecar('binaries/webserver_proc');
+      let output = await command.execute();
+      console.log("put = " + output.stderr + " " + output.stdout); 
+      //child.kill();
+      //console.log("Process After Kill: " + child.pid);
+    }
+    //sidecarSetup(); //ignore
+    
     const onError = (event) => {
       console.error("[RocketView] Unhandled error:", event.error ?? event.message, event.filename, event.lineno);
     };

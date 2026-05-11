@@ -2,10 +2,53 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
-    "core:window:allow-set-fullscreen"
+    "core:window:allow-set-fullscreen",
+     {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "binaries/webserver_proc",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "binaries/webserver_proc",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-kill",
+      "allow": [
+        {
+          "name": "binaries/webserver/webserver_proc",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+        "allow": [
+        {
+          "args": [
+            "-help"
+
+          ],
+          "name": "binaries/ffmpeg",
+          "sidecar": true
+        }
+      ]
+    }
+    
   ]
 }
