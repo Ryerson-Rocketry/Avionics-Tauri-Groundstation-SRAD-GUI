@@ -35,20 +35,6 @@
           "sidecar": true
         }
       ]
-    },
-    {
-      "identifier": "shell:allow-execute",
-        "allow": [
-        {
-          "args": [
-            "-help"
-
-          ],
-          "name": "binaries/ffmpeg",
-          "sidecar": true
-        }
-      ]
     }
-    
   ]
 }

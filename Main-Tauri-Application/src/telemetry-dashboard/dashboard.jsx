@@ -5,7 +5,7 @@ import { SimViewPanel } from "./components/SimViewPanel";
 import { ChartPanel } from "./components/ChartPanel.jsx";
 import { StatsPanel } from "./components/StatsPanel";
 import { TerminalPanel } from "./components/TerminalPanel";
-import { HeaderBar } from "./components/HeaderBar";
+import { HeaderBar } from "./components/Header/HeaderBar";
 import { Timeline } from "./components/Timeline";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -17,6 +17,7 @@ import "leaflet/dist/leaflet.css";
 import { ChartGroupPanel } from "./components/ChartGroupPanel.jsx";
 
 import "./dashboard.css";
+import { GaugeGroupPanel } from "./components/GaugeGroupPanel.jsx";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -35,7 +36,7 @@ function MapRecenter({ coords }) {
 
 
 
-export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, replay }) {
+export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, replay, useDemoMode, immediateStartMode, craftName }) {
   const { tokens: ui, styles: uiStyles } = useTheme();
   const dash = uiStyles.telemetryDashboard;
   const [isLive] = useState(true);
@@ -46,6 +47,24 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
   const [telemetryState, setTelemetryState] = useState(true);
   const [windowState, setWindowState] = useState(false);
 
+  const [dummyMode, setDummyMode] = useState(!immediateStartMode); 
+  
+  /*
+  const [live, useLive] = useState(useTelemetry(
+    !replay && isLive && !isFinished,
+    socketUrl || "",
+    profile,
+    {
+      chartUpdateIntervalSeconds: chartUpdateIntervalSec, 
+      recordingSaveDirName: saveDirName || null,
+    },
+    useDemoMode,
+    !immediateStartMode
+  ));
+  */
+
+
+  
   const live = useTelemetry(
     !replay && isLive && !isFinished,
     socketUrl || "",
@@ -53,8 +72,11 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
     {
       chartUpdateIntervalSeconds: chartUpdateIntervalSec, 
       recordingSaveDirName: saveDirName || null,
-    }
+    },
+    useDemoMode,
+    dummyMode
   );
+  
 
   const handleExit = useCallback(async () => {
     if (replay) {
@@ -79,11 +101,27 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
     setWindowState(!windowState);
   }
 
+  function onStartMission(){
+    setDummyMode(false);
+  }
+
+  /*
   const telemetry = replay?.telemetry ?? live.telemetry;
   const history = replay?.history ?? live.history;
   const rocketPos = replay?.rocketPos ?? live.rocketPos;
   const chartData = replay?.chartData ?? live.chartData;
   const consoleLogs = replay?.consoleLogs ?? live.consoleLogs;
+  const stdLogs = replay?.stdLogs ?? live.stdLogs;
+  const stats = replay?.stats ?? live.stats;
+  const lastCloseReason = replay?.lastCloseReason ?? live.lastCloseReason;
+  */
+
+  const telemetry = replay?.telemetry ?? live.telemetry;
+  const history = replay?.history ?? live.history;
+  const rocketPos = replay?.rocketPos ?? live.rocketPos;
+  const chartData = replay?.chartData ?? live.chartData;
+  const consoleLogs = replay?.consoleLogs ?? live.consoleLogs;
+  const stdLogs = replay?.stdLogs ?? live.stdLogs;
   const stats = replay?.stats ?? live.stats;
   const lastCloseReason = replay?.lastCloseReason ?? live.lastCloseReason;
 
@@ -131,15 +169,24 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
         onTelemetryState={setTelemetryState}
         onFullscreen={onFullscreen}
         fullScreenState={windowState}
+        dummyMode={dummyMode}
+        onStartMission={onStartMission}
+        craftName={craftName}
       />
 
       <main className="dashboardGrid" >
-        <SimViewPanel
+        <div className={telemetryState === true ? "dashboardLeftNormal" : "dashboardLeftExpanded"}>
+          <SimViewPanel
           telemetry={telemetry}
           history={history}
           rocketPos={rocketPos}
           isLocked={isLocked}
-        />
+          />
+          {telemetryState === false ? <GaugeGroupPanel className = "dashboardGauge" stats={stats}/> : [] }
+        </div>
+ 
+
+        {/*telemetryState === false ? <GaugeGroupPanel className = "dashboardGauge" stats={stats}/> : []*/}
 
         <div className={telemetryState === true ? "dashboardRightNormal" : "dashboardRightExpanded"} >
           <StatsPanel stats={stats} />
@@ -150,10 +197,18 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
             chartUpdateIntervalSec={chartUpdateIntervalSec}
             onChartUpdateIntervalChange={setChartUpdateIntervalSec}/>
         </div>
-        <TerminalPanel 
+
+        {
+          telemetryState === true ?
+          <TerminalPanel 
           consoleLogs={consoleLogs}
+          stdLogs = {stdLogs}
           fullWidth={profile?.features?.enable_map_view !== telemetryState}
-        />
+          />
+          :
+          []
+        }
+        
       </main>
     </div>
   );

@@ -11,7 +11,7 @@ import { useTheme } from "../styles/ThemeContext.jsx";
 export default function TelemetryDashboardPage({ mission, onExit }) {
   if (!mission) return null;
 
-  const { ip, port, endpoint, profile } = mission;
+  const { ip, port, endpoint, profile, mode, immediateStartMode, craftName } = mission;
 
   let socketUrl = endpoint || "";
   if (!socketUrl && ip && port) {
@@ -35,6 +35,9 @@ export default function TelemetryDashboardPage({ mission, onExit }) {
         onAbort={onExit}
         socketUrl={socketUrl}
         saveDirName={mission.saveDirName}
+        useDemoMode={mission.mode}
+        immediateStartMode={mission.immediateStartMode}
+        craftName={craftName}
       />
     </div>
   );

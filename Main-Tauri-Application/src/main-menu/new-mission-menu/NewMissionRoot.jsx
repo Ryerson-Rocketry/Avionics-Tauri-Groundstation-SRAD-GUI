@@ -22,6 +22,7 @@ function withTimeout(promise, timeoutMs, timeoutMessage) {
 const NewMissionRoot = ({ onMissionLinkReady }) => {
   const { tokens: ui, styles: uiStyles } = useTheme();
   const [missionName, setMissionName] = useState('');
+  const [craftName, setCraftName] = useState('');
   const [savePath, setSavePath] = useState('Default RocketView saves location');
   const [schemaId, setSchemaId] = useState('');
   const [saveData, setSaveData] = useState(true);
@@ -37,10 +38,14 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
 
+  const [useDemoMode, setUseDemoMode] = useState(false);
+  const [useImmediateStartMode, setUseImmediateStartMode] = useState(true);
+
   const wsRef = useRef(null);
   const connectTimeoutRef = useRef(null);
 
   const canConnect =
+    //dont allow start unless these are filled in
     missionName.trim().length > 0 &&
     schemaId.trim().length > 0 &&
     telemetryIp.trim().length > 0 &&
@@ -143,10 +148,13 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
         port,
         endpoint: `${ip}:${port}`,
         missionName: missionName.trim(),
+        craftName: craftName.trim(),
         schema: selectedSchema,
         profile: selectedSchema,
         saveDirName: saveDirName ?? undefined,
         saveData: !!saveData,
+        mode: useDemoMode,
+        immediateStartMode: useImmediateStartMode
       });
     };
 
@@ -196,6 +204,16 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
                   placeholder="e.g. ORBITAL_TEST_01"
                   value={missionName}
                   onChange={(e) => setMissionName(e.target.value)}
+                />
+              </div>
+               <div style={styles.column}>
+                <label style={styles.label}>Craft Name</label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  placeholder="e.g. Artemis II"
+                  value={craftName}
+                  onChange={(e) => setCraftName(e.target.value)}
                 />
               </div>
               <div style={styles.column}>
@@ -250,8 +268,9 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
             </p>
             <div style={styles.row}>
               <div style={styles.column}>
-                <label style={styles.label}>Server IP</label>
+                <label style={styles.label}>Server IP (Ignore)</label>
                 <input
+                  disabled
                   style={styles.input}
                   type="text"
                   placeholder="e.g. 127.0.0.1 or 192.168.50.83"
@@ -260,8 +279,9 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
                 />
               </div>
               <div style={styles.column}>
-                <label style={styles.label}>Port</label>
+                <label style={styles.label}>Port (Ignore)</label>
                 <input
+                  disabled
                   style={styles.input}
                   type="text"
                   placeholder="e.g. 8765"
@@ -296,6 +316,24 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
             {connectionError && (
               <div style={styles.startError}>{connectionError}</div>
             )}
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={useDemoMode}
+                onChange={(e) => (setUseDemoMode(e.target.checked))}
+                style={styles.checkbox}
+              />
+              <span>Use Demo Mode</span>
+            </label>
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={useImmediateStartMode}
+                onChange={(e) => (setUseImmediateStartMode(e.target.checked))}
+                style={styles.checkbox}
+              />
+              <span>Start Mission Immediately on Telemetry Server Connect</span>
+            </label>
             <Button
               size="md"
               variant="gradient"

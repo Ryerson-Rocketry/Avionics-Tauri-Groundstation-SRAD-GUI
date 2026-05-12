@@ -88,6 +88,8 @@ import { invoke } from "@tauri-apps/api/core";
 import * as THREE from "three";
 
 import { mean, sqrt, variance } from "mathjs";
+import { listen } from '@tauri-apps/api/event';
+
 
 const RECORDING_FLUSH_INTERVAL_MS = 3000;
 
@@ -107,7 +109,9 @@ const DEFAULT_CHART_INTERVAL_SEC = 1;
  * visualizers.show_in_terminal are included in consoleLogs with label/value/unit.
  * `options.chartUpdateIntervalSeconds` throttles how often chart + trajectory update (reduces re-renders).
  */
-export function useTelemetry(isLive, socketUrl, profile, options = {}) {
+
+//where dummy mode = don't actually run the thing
+export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMode, dummyMode) {
   const chartIntervalSec = Math.max(0.1, Number(options.chartUpdateIntervalSeconds) || DEFAULT_CHART_INTERVAL_SEC);
   const chartIntervalMs = chartIntervalSec * 1000;
   const recordingSaveDirName = options.recordingSaveDirName ?? null;
@@ -210,6 +214,8 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
   const [socketOBJ, setSocketOBJ] = useState(undefined);
 
   const [consoleLogs, setConsoleLogs] = useState([]);
+  //python webserver std out/err longs
+  const [stdLogs, setStdLogs] = useState([]);
 
   const [stats, setStats] = useState({
     
@@ -282,6 +288,11 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
 
   const [lastCloseReason, setLastCloseReason] = useState(null);
 
+  useEffect(() => {
+    console.log("dummyMode: " + dummyMode);
+
+  },[dummyMode]);
+
   //KNOWN ISSUE: WILL CREATE A WEBSOCKET CONNECTION, END IT, THEN CREATE ANOTHER ONE (THAT ACTUALLY FUNCTIONS)
   //moved to separate useffect with no deps so it only creates socket once
   useEffect(() => {
@@ -306,7 +317,15 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
       socket.onopen = () => {
         //set mode on server
         console.log("SOCKET CREATED");
-        socket.send("demo");
+        console.log("mission setup (useDemoMode) is: " + useDemoMode);
+        console.log("mission setup (dummyMode) is: " + dummyMode);
+        if (useDemoMode == true){
+          socket.send("demo");
+        }
+        else{
+          socket.send("live");
+        }
+        
 
         setLastCloseReason(null);
       };
@@ -341,7 +360,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
   }, []);
 
   useEffect(() => {
-    if (!isLive || !socketUrl || socketOBJ == undefined) return;
+    if (!isLive || !socketUrl || socketOBJ == undefined || dummyMode == true ) return;
 
     let url = socketUrl;
     if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
@@ -539,7 +558,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
       //moved to new use effect hook
       //if (socket) socket.close();
     };
-  }, [isLive, socketUrl, flushRecording, socketOBJ]);
+  }, [isLive, socketUrl, flushRecording, socketOBJ, dummyMode]);
 
   return {
     telemetry,
@@ -547,6 +566,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}) {
     rocketPos: telemetry.pos,
     chartData,
     consoleLogs,
+    stdLogs,
     stats,
     lastCloseReason,
     flushRecording,

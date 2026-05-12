@@ -1,9 +1,17 @@
 import React from "react";
-import { useTheme } from "../../styles/ThemeContext.jsx";
-import Button from "../../components/Button.jsx";
-import { labels } from "../../config/labels.jsx";
+import { useTheme } from "../../../styles/ThemeContext.jsx";
+import Button from "../../../components/Button.jsx";
+import { labels } from "../../../config/labels.jsx";
+import { useState } from "react";
+import { TimeDisplay } from "./TimeDisplay.jsx";
+
+
+import logo from '../../../../assets/rocketry_logo.png';
+
 
 function HeaderStat({ label, val, unit, isString }) {
+
+
   const { tokens: ui, styles: uiStyles } = useTheme();
   const dash = uiStyles.telemetryDashboard;
   const data = isString === true ? val : Number(val || 0);
@@ -18,6 +26,7 @@ function HeaderStat({ label, val, unit, isString }) {
   );
 }
 
+
 export function HeaderBar({
   mission,
   telemetry,
@@ -30,15 +39,33 @@ export function HeaderBar({
   onTelemetryState,
   telemetryState,
   onFullscreen,
-  fullScreenState
+  fullScreenState,
+  dummyMode,
+  onStartMission,
+  craftName
 }) {
+
+
   const { tokens: ui, styles: uiStyles } = useTheme();
   const dash = uiStyles.telemetryDashboard;
   const isConnected = isLive && !isFinished && telemetry?.status !== "DISCONNECTED";
 
+  const [time, setTime] = useState(new Date());
+
+
+  React.useEffect(() => {
+    const timer = setInterval(() => { 
+      setTime(new Date());
+    }, 25);
+    return () => {
+      clearInterval(timer); // Return a funtion to clear the timer so that it will stop being called on unmount
+    }
+  }, []);
+
   return (
     <nav style={dash.navBar}>
       <div style={{ display: "flex", alignItems: "center", gap: "1vw" }}>
+        <img width={50} src={logo} alt="Logo" />
         <div
           style={{
             width: "8px",
@@ -53,12 +80,32 @@ export function HeaderBar({
             {mission?.mission_metadata?.name || "—"}
           </span>
           <div style={{ fontFamily: ui.font.googleSans, fontSize: ui.text.xs, color: ui.colors.gray, letterSpacing: "1px" }}>
+            Craft: {craftName || "—"}
+          </div>
+          <div style={{ fontFamily: ui.font.googleSans, fontSize: ui.text.xs, color: ui.colors.gray, letterSpacing: "1px" }}>
             {isConnected ? labels.telemetry.streamConnected : lastCloseReason ? `Disconnected: ${lastCloseReason}` : labels.telemetry.streamDisconnected}
           </div>
         </div>
       </div>
+        
+      <div style={{ display: "flex", alignItems: "center"}}>
+        <div style={{ fontFamily: ui.font.googleSans, fontSize: ui.text.s, color: ui.colors.white, letterSpacing: "1px" }}>
+          Time - |
+        </div>  
 
-      <div style={{ display: "flex", gap: "3vw" }}>
+        <TimeDisplay time={time.getDate()} label={"Day"} padding={2}/>
+        
+        <TimeDisplay time={time.getHours()} label={"Hour"} padding={2}/>
+        
+        <TimeDisplay time={time.getMinutes()} label={"Min"} padding={2}/>
+        
+        <TimeDisplay time={time.getSeconds()} label={"Sec"} padding={2}/>
+        
+        <TimeDisplay time={time.getMilliseconds()} label={"Milisec"} padding={3}/>
+        |
+      </div>
+
+      <div style={{ display: "flex", gap: "1vw" }}>
         <HeaderStat label={labels.telemetry.statAltitude} val={telemetry.alt} unit="m" isString={false} />
         <HeaderStat label={labels.telemetry.statVelocity} val={telemetry.vel} unit="m/s" isString={false} />
         <HeaderStat label={labels.telemetry.statMissionTime} val={telemetry.time} unit="s" isString={false} />
@@ -67,10 +114,10 @@ export function HeaderBar({
 
       <div style={{ display: "flex", alignItems: "center", gap: "0.8vw" }}>
         <Button size="sm" variant="outline" outlineColor={ui.colors.cyan} textColor={ui.colors.cyan} onClick={() => onTelemetryState(!telemetryState)} >
-          {telemetryState === true ? "Minimize " : "Expand "} Raw Telemetry Stream
+          {telemetryState === true ? "Minimize " : "Expand "} Console
         </Button>
         <Button disabled size="sm" variant="outline" outlineColor={ui.colors.cyan} textColor={ui.colors.cyan} >
-          Arrange/Disable Right Data Panels
+          Manage View Panel
         </Button>
         <button
           onClick={onToggleLock}
@@ -91,6 +138,9 @@ export function HeaderBar({
         </Button>
         <Button size="sm" variant="outline" outlineColor={ui.colors.cyan} textColor={ui.colors.cyan} onClick={onFullscreen}>
           {fullScreenState === true ? "Fullscreen" : "Minimize"}
+        </Button>
+        <Button disabled={dummyMode === true ? false : true} size="sm" variant="outline" outlineColor={ui.colors.yellow} textColor={ui.colors.yellow} onClick={onStartMission}>
+          START MISSION
         </Button>
       </div>
     </nav>

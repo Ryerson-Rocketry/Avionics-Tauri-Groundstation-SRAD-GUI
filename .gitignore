@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 Telemetry-Python-Webserver/build/*
+Telemetry-Python-Webserver/.venv/*
+_Build/*
+Main-Tauri-Application/src-tauri/binaries/*

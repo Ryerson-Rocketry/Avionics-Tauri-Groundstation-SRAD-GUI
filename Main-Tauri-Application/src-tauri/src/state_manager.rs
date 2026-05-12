@@ -1,16 +1,22 @@
-use serde::{Serialize, Deserialize};
+use local_ip_address::local_ip;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener};
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
-use serde_json::json;
-use local_ip_address::local_ip;
 
 fn sanitize_save_dir_name(name: &str) -> String {
     name.chars()
-        .map(|c| if c.is_alphanumeric() || c == '_' || c == '-' { c } else { '_' })
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' || c == '-' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect::<String>()
         .trim_matches('_')
         .to_string()
@@ -43,9 +49,11 @@ pub struct StartupData {
 #[tauri::command]
 pub fn initialize_app(handle: AppHandle) -> Result<StartupData, String> {
     // In Tauri v2, we use .path().app_data_dir()
-    let app_dir = handle.path().app_data_dir()
+    let app_dir = handle
+        .path()
+        .app_data_dir()
         .map_err(|_| "Could not find system AppData directory".to_string())?;
-    
+
     // The rest of your code remains the same...
     let settings_path = app_dir.join("settings.json");
     let saves_dir = app_dir.join("saves");
@@ -82,7 +90,10 @@ pub fn initialize_app(handle: AppHandle) -> Result<StartupData, String> {
         }
     }
 
-    Ok(StartupData { settings, available_saves })
+    Ok(StartupData {
+        settings,
+        available_saves,
+    })
 }
 
 #[tauri::command]
@@ -92,7 +103,9 @@ pub fn save_schema(handle: tauri::AppHandle, schema: serde_json::Value) -> Resul
     fs::create_dir_all(&schemas_dir).map_err(|e| e.to_string())?;
 
     // Use the mission name as the filename (sanitized)
-    let name = schema["mission_metadata"]["name"].as_str().unwrap_or("unnamed_schema");
+    let name = schema["mission_metadata"]["name"]
+        .as_str()
+        .unwrap_or("unnamed_schema");
     let filename = format!("{}.json", name.to_lowercase().replace(" ", "_"));
     let path = schemas_dir.join(filename);
 
@@ -105,16 +118,20 @@ pub fn save_schema(handle: tauri::AppHandle, schema: serde_json::Value) -> Resul
 pub fn load_schemas(handle: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
     let app_dir = handle.path().app_data_dir().unwrap();
     let schemas_dir = app_dir.join("schemas");
-    
+
     let mut results = Vec::new();
     if let Ok(entries) = fs::read_dir(schemas_dir) {
         for entry in entries.flatten() {
             let content = fs::read_to_string(entry.path()).map_err(|e| e.to_string())?;
-            let mut json: serde_json::Value = serde_json::from_str(&content).map_err(|e| e.to_string())?;
-            
+            let mut json: serde_json::Value =
+                serde_json::from_str(&content).map_err(|e| e.to_string())?;
+
             // Add the filename as a temporary ID for React tracking
             if let Some(obj) = json.as_object_mut() {
-                obj.insert("id".to_string(), serde_json::Value::String(entry.file_name().to_string_lossy().to_string()));
+                obj.insert(
+                    "id".to_string(),
+                    serde_json::Value::String(entry.file_name().to_string_lossy().to_string()),
+                );
             }
             results.push(json);
         }
@@ -124,9 +141,11 @@ pub fn load_schemas(handle: tauri::AppHandle) -> Result<Vec<serde_json::Value>, 
 
 #[tauri::command]
 pub fn delete_schema(handle: tauri::AppHandle, id: String) -> Result<(), String> {
-    let app_dir = handle.path().app_data_dir()
+    let app_dir = handle
+        .path()
+        .app_data_dir()
         .map_err(|_| "Could not find AppData directory".to_string())?;
-    
+
     // The 'id' we passed from React is actually the filename (e.g., "my_mission.json")
     let file_path = app_dir.join("schemas").join(&id);
 
@@ -139,16 +158,19 @@ pub fn delete_schema(handle: tauri::AppHandle, id: String) -> Result<(), String>
 }
 
 #[tauri::command]
-pub fn save_settings(handle: tauri::AppHandle, new_settings: serde_json::Value) -> Result<(), String> {
+pub fn save_settings(
+    handle: tauri::AppHandle,
+    new_settings: serde_json::Value,
+) -> Result<(), String> {
     let app_dir = handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let settings_path = app_dir.join("settings.json"); // or .txt if you prefer
 
     // Convert the JSON to a pretty-printed string
     let content = serde_json::to_string_pretty(&new_settings).map_err(|e| e.to_string())?;
-    
+
     // Write to disk
     std::fs::write(settings_path, content).map_err(|e| e.to_string())?;
-    
+
     println!("System configuration synchronized to disk.");
     Ok(())
 }
@@ -180,7 +202,10 @@ pub fn create_mission_save(
     };
     let save_path = saves_dir.join(&save_dir_name);
     if save_path.exists() {
-        return Err("A save with this mission name already exists. Choose a different mission name.".to_string());
+        return Err(
+            "A save with this mission name already exists. Choose a different mission name."
+                .to_string(),
+        );
     }
     fs::create_dir_all(&save_path).map_err(|e| e.to_string())?;
 
@@ -222,7 +247,10 @@ pub fn append_telemetry_chunk(
         for entry in entries.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
             if name.starts_with("telemetry_part_") && name.ends_with(".csv") {
-                if let Some(n) = name.strip_prefix("telemetry_part_").and_then(|s| s.strip_suffix(".csv")) {
+                if let Some(n) = name
+                    .strip_prefix("telemetry_part_")
+                    .and_then(|s| s.strip_suffix(".csv"))
+                {
                     if let Ok(n) = n.parse::<u32>() {
                         part_num = part_num.max(n + 1);
                     }
@@ -269,7 +297,10 @@ pub fn finalize_mission_save(handle: AppHandle, save_dir_name: String) -> Result
             let path = entry.path();
             let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
             if name.starts_with("telemetry_part_") && name.ends_with(".csv") {
-                if let Some(n) = name.strip_prefix("telemetry_part_").and_then(|s| s.strip_suffix(".csv")) {
+                if let Some(n) = name
+                    .strip_prefix("telemetry_part_")
+                    .and_then(|s| s.strip_suffix(".csv"))
+                {
                     if let Ok(n) = n.parse::<u32>() {
                         part_files.push((n, path));
                     }
@@ -307,22 +338,28 @@ pub fn finalize_mission_save(handle: AppHandle, save_dir_name: String) -> Result
             fs::write(
                 save_path.join("save.json"),
                 serde_json::to_string_pretty(&meta).map_err(|e| e.to_string())?,
-            ).map_err(|e| e.to_string())?;
+            )
+            .map_err(|e| e.to_string())?;
         }
     }
     Ok(total_rows)
 }
 
 #[tauri::command]
-pub fn load_mission_save(handle: AppHandle, save_dir_name: String) -> Result<serde_json::Value, String> {
+pub fn load_mission_save(
+    handle: AppHandle,
+    save_dir_name: String,
+) -> Result<serde_json::Value, String> {
     let app_dir = handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let save_path = app_dir.join("saves").join(&save_dir_name);
     if !save_path.exists() {
         return Err("Save folder not found".to_string());
     }
-    let save_meta_str = fs::read_to_string(save_path.join("save.json")).map_err(|e| e.to_string())?;
+    let save_meta_str =
+        fs::read_to_string(save_path.join("save.json")).map_err(|e| e.to_string())?;
     let save_meta: SaveMeta = serde_json::from_str(&save_meta_str).map_err(|e| e.to_string())?;
-    let schema_str = fs::read_to_string(save_path.join("schema.json")).map_err(|e| e.to_string())?;
+    let schema_str =
+        fs::read_to_string(save_path.join("schema.json")).map_err(|e| e.to_string())?;
     let schema: serde_json::Value = serde_json::from_str(&schema_str).map_err(|e| e.to_string())?;
 
     let csv_path = save_path.join("telemetry.csv");
@@ -353,7 +390,10 @@ pub fn load_mission_save(handle: AppHandle, save_dir_name: String) -> Result<ser
                 let path = entry.path();
                 let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
                 if name.starts_with("telemetry_part_") && name.ends_with(".csv") {
-                    if let Some(n) = name.strip_prefix("telemetry_part_").and_then(|s| s.strip_suffix(".csv")) {
+                    if let Some(n) = name
+                        .strip_prefix("telemetry_part_")
+                        .and_then(|s| s.strip_suffix(".csv"))
+                    {
                         if let Ok(n) = n.parse::<u32>() {
                             part_files.push((n, path));
                         }
@@ -430,7 +470,10 @@ pub fn start_mission_socket(
     // Bind to an available ephemeral port on that IP.
     let socket = SocketAddr::new(ip_addr, 0);
     let listener = TcpListener::bind(socket).map_err(|e| {
-        eprintln!("[start_mission_socket] Failed to bind listener on {}: {}", socket, e);
+        eprintln!(
+            "[start_mission_socket] Failed to bind listener on {}: {}",
+            socket, e
+        );
         format!("Failed to bind mission socket: {}", e)
     })?;
 

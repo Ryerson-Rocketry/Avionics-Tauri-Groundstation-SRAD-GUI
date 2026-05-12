@@ -1,7 +1,7 @@
 .dashboardRightExpanded {
     height: 85vh; 
     grid-column: 2;
-    grid-row: 1 / 2;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
     /*
@@ -38,7 +38,20 @@
 }
 
 .dashboardLeftExpanded {
-    height: 70vh; 
+    height: 85vh; 
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    /*
+    border-color: aqua;
+    border-style: dashed;
+    */
+    gap: "1.2vh";
+}
+
+.dashboardGauge {
+    height: 15vh; 
     grid-column: 1;
     grid-row: 1;
     display: flex;

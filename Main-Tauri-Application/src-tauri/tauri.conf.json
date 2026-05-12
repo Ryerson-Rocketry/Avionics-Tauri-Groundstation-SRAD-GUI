@@ -33,8 +33,7 @@
     ],
 
     "externalBin": [
-      "binaries/webserver_proc",
-      "binaries/ffmpeg"
+      "binaries/webserver_proc"
     ]
   }
 }

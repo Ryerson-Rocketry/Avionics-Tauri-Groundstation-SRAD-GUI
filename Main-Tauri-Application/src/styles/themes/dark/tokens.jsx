@@ -10,6 +10,7 @@ export const ui = {
     red: '#FF5555',
     green: '#50FA7B',
     glassBg: 'rgba(34, 35, 40, 0.4)',
+    yellow: '#e5ff00'
   },
   font: {
     orbitron: '"Orbitron", sans-serif',

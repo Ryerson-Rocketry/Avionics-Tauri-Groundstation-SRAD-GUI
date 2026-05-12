@@ -172,7 +172,6 @@ async def rocketry_data_csv_test_console():
 if __name__ == "__main__":
     
     print("server start")
-    #asyncio.run(producer())
     asyncio.run(main())
     
 
