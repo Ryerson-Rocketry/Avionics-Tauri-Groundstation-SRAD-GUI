@@ -5,7 +5,7 @@ import { ZOOM_MIN, ZOOM_MAX, DEFAULT_ZOOM } from "../simulator/TelemetryScene.js
 import { GpsScene } from "../simulator/GpsScene.jsx";
 import Button from "../../components/Button.jsx";
 
-
+import TelemetrCesiumScene from "../simulator/TelemetryCesiumScene.jsx";
 
 export const DEFAULT_ZOOM_GPS = 14;
 export const ZOOM_MIN_GPS = 12;
@@ -141,7 +141,7 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
         <div style={{ flex: 2, minHeight: 0 }}>
           {mapState === true ?
           <div>
-            <TelemetryScene
+            <TelemetrCesiumScene
               telemetry={telemetry}
               history={history}
               rocketPos={moddedRocketPos}

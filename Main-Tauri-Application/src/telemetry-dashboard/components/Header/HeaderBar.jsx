@@ -4,7 +4,7 @@ import Button from "../../../components/Button.jsx";
 import { labels } from "../../../config/labels.jsx";
 import { useState } from "react";
 import { TimeDisplay } from "./TimeDisplay.jsx";
-
+import Divider from '@mui/material/Divider';
 
 import logo from '../../../../assets/rocketry_logo.png';
 
@@ -88,29 +88,46 @@ export function HeaderBar({
         </div>
       </div>
         
-      <div style={{ display: "flex", alignItems: "center"}}>
-        <div style={{ fontFamily: ui.font.googleSans, fontSize: ui.text.s, color: ui.colors.white, letterSpacing: "1px" }}>
-          Time - |
-        </div>  
+      
+      <Divider variant="middle" orientation="vertical"  style={{backgroundColor: "gray", marginRight: 4}} flexItem height={30}  />
+      <div style={{ display: "flex", alignItems: "center", flexDirection:"column"}}>
+         
+        
+        <div style={{ display: "flex", alignItems: "center", flexDirection:"row", fontFamily: ui.font.googleSans, fontSize: ui.text.s, color: ui.colors.white, letterSpacing: "1px" }}>
+          Time - 
+          <TimeDisplay time={time.getDate()} label={"Day"} padding={2}/>
+          <TimeDisplay time={time.getHours()} label={"Hour"} padding={2}/>  
+          <TimeDisplay time={time.getMinutes()} label={"Min"} padding={2}/> 
+          <TimeDisplay time={time.getSeconds()} label={"Sec"} padding={2}/>
+          <TimeDisplay time={time.getMilliseconds()} label={"Milisec"} padding={3}/>
+          
+        </div>
 
-        <TimeDisplay time={time.getDate()} label={"Day"} padding={2}/>
-        
-        <TimeDisplay time={time.getHours()} label={"Hour"} padding={2}/>
-        
-        <TimeDisplay time={time.getMinutes()} label={"Min"} padding={2}/>
-        
-        <TimeDisplay time={time.getSeconds()} label={"Sec"} padding={2}/>
-        
-        <TimeDisplay time={time.getMilliseconds()} label={"Milisec"} padding={3}/>
-        |
+        <div style={{ marginRight: "8px", display: "flex", alignItems: "center", flexDirection:"row", fontFamily: ui.font.googleSans, fontSize: ui.text.s, color: ui.colors.white, letterSpacing: "1px" }}>
+          <div>(T{Number(telemetry.time) < 0 ? "-" : "+"}) -</div>
+          <TimeDisplay time={0} label={"Day"} padding={2}/>
+          <TimeDisplay time={Math.floor(Math.abs(telemetry.time) / 3600)} label={"Hour"} padding={2}/>  
+          <TimeDisplay time={Math.floor(Math.abs(telemetry.time)  / 60)} label={"Min"} padding={2}/> 
+          <TimeDisplay time={(Math.abs(telemetry.time)   - Math.floor(Math.abs(telemetry.time)  / 60) * 60).toFixed(0)} label={"Sec"} padding={2}/>
+          
+          <TimeDisplay time={Number(Math.abs(telemetry.time) ).toFixed(0)} label={"Raw"} padding={2}/>
+          
+          </div>
       </div>
+
+
+      <Divider variant="middle" orientation="vertical"  style={{backgroundColor: "gray", marginRight: 4}} flexItem height={30}  />
 
       <div style={{ display: "flex", gap: "1vw" }}>
+        
         <HeaderStat label={labels.telemetry.statAltitude} val={telemetry.alt} unit="m" isString={false} />
         <HeaderStat label={labels.telemetry.statVelocity} val={telemetry.vel} unit="m/s" isString={false} />
-        <HeaderStat label={labels.telemetry.statMissionTime} val={telemetry.time} unit="s" isString={false} />
+        {/*<HeaderStat label={labels.telemetry.statMissionTime} val={telemetry.time} unit="s" isString={false} />*/}
         <HeaderStat label={labels.telemetry.statMissionState} val={telemetry.stateName} unit="" isString={true}/>
+        
       </div>
+
+      <Divider variant="middle" orientation="vertical"  style={{backgroundColor: "gray"}} flexItem height={30}  />
 
       <div style={{ display: "flex", alignItems: "center", gap: "0.8vw" }}>
         <Button size="sm" variant="outline" outlineColor={ui.colors.cyan} textColor={ui.colors.cyan} onClick={() => onTelemetryState(!telemetryState)} >

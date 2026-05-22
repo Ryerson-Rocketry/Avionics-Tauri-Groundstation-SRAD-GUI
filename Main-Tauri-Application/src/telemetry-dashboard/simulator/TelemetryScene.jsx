@@ -8,9 +8,9 @@ import { LaunchPlatform } from "../landscape/LaunchPlatform.jsx";
 import { Trajectory } from "../landscape/Trajectory.jsx";
 import { GpsScene } from "./GpsScene.jsx";
 
-const DEFAULT_ZOOM = 56;
-const ZOOM_MIN = 20;
-const ZOOM_MAX = 120;
+const DEFAULT_ZOOM = 14;
+const ZOOM_MIN = 12;
+const ZOOM_MAX = 20;
 const CAM_DIR = new THREE.Vector3(30, 15, 45).normalize();
 
 function CameraRig({ targetPos, isTrackOn, controlsRef, zoomDistance }) {

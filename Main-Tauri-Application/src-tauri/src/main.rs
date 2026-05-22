@@ -18,6 +18,7 @@ mod state_manager;
 //  .expect("Failed to spawn sidecar");
 
 fn sidecar_handle(app: tauri::AppHandle) {
+    println!("Initializiting Sidecar");
     let sidecar_command = app.shell().sidecar("webserver_proc").unwrap();
     let (mut _rx, sidecar_child) = sidecar_command
         .spawn()
@@ -70,7 +71,8 @@ fn main() {
             let app_handle = app.handle().clone();
             if cfg!(dev) {
                 // `tauri dev` only code
-                println!("IN DEV MODE, REMEMBER TO LAUNCH MANUALLY PYTHON WEBSERVER")
+                println!("IN DEV MODE, REMEMBER TO LAUNCH MANUALLY PYTHON WEBSERVER");
+                //sidecar_handle(app_handle);
 
             } else {
                 // `tauri build` only code
