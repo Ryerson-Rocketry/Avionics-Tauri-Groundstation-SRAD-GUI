@@ -1,3 +1,5 @@
 pyserial
 websockets
 pyinstaller
+syial
+pyserial-asyncio
