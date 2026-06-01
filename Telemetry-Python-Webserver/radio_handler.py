@@ -22,11 +22,10 @@ async def serial_connect():
             print ("SUCCESS: SERIAL CONNECTION MADE. Redirecting back to main serial data read loop", flush = True)
             return reader, writer
             break
-        except:
+        except Exception as e:
             print("ERR: failed to find radio reciever device, trying again...", flush = True)
             ports = serial.tools.list_ports.comports()
-            for port, desc, hwid in sorted(ports):
-                print("{}: {} [{}]".format(port, desc, hwid), flush = True)
+            print(e, flush = True)
             await asyncio.sleep(1)
 
 

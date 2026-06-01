@@ -78,7 +78,7 @@ fn main() {
             if cfg!(dev) {
                 // `tauri dev` only code
                 println!("IN DEV MODE, REMEMBER TO LAUNCH MANUALLY PYTHON WEBSERVER");
-                sidecar_handle(app_handle);
+                //sidecar_handle(app_handle);
 
             } else {
                 // `tauri build` only code
