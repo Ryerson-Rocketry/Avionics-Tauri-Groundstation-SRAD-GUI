@@ -17,6 +17,11 @@ mod state_manager;
 //  .spawn()
 //  .expect("Failed to spawn sidecar");
 
+
+use serde::Serialize;
+
+
+
 fn sidecar_handle(app: tauri::AppHandle) {
     println!("Initializiting Sidecar");
     let sidecar_command = app.shell().sidecar("webserver_proc").unwrap();
@@ -55,9 +60,10 @@ fn sidecar_handle(app: tauri::AppHandle) {
         while let Some(event) = _rx.recv().await {
             if let CommandEvent::Stdout(line_bytes) = event {
             let line = String::from_utf8_lossy(&line_bytes);
+            let line_type = "test";
             app
-                .emit("stdout", Some(format!("'{}'", line)))
-                .expect("failed to emit event");
+                .emit("stdout", line.to_string())
+                .expect("Failed to emit sidecar stderr event");
             println!("stdOut: {}", line);
             }
         }
@@ -72,7 +78,7 @@ fn main() {
             if cfg!(dev) {
                 // `tauri dev` only code
                 println!("IN DEV MODE, REMEMBER TO LAUNCH MANUALLY PYTHON WEBSERVER");
-                //sidecar_handle(app_handle);
+                sidecar_handle(app_handle);
 
             } else {
                 // `tauri build` only code

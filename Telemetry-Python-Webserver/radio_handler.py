@@ -1,292 +1,101 @@
 import datetime
 
 import serial
-from websockets.asyncio.server import serve
 import serial_asyncio
 import asyncio
 import json
 
 
 import time as t
-
-import unittest 
-
-port = "COM3"
-baud  = 115200 
 from websockets.exceptions import ConnectionClosedOK
 
 
-"""
-class InputChunkProtocol(asyncio.Protocol):
-    def connection_made(self, transport):
-        self.transport = transport
+import serial.tools.list_ports #https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python 
 
-    def data_received(self, data):
+async def serial_connect():
+    while(True):
         try:
-            #print('data received', repr(data))
-            self.transport.write(b'Hello, World!\n')
+            ports = serial.tools.list_ports.comports()
+            for port, desc, hwid in sorted(ports):
+                print("INFO: available COM port found at:" + port , flush = True)
+            reader, writer = await serial_asyncio.open_serial_connection(url=port, baudrate=115200)
+            print ("SUCCESS: SERIAL CONNECTION MADE. Redirecting back to main serial data read loop", flush = True)
+            return reader, writer
+            break
+        except:
+            print("ERR: failed to find radio reciever device, trying again...", flush = True)
+            ports = serial.tools.list_ports.comports()
+            for port, desc, hwid in sorted(ports):
+                print("{}: {} [{}]".format(port, desc, hwid), flush = True)
+            await asyncio.sleep(1)
 
-            # stop callbacks again immediately
-            self.pause_reading()
-        except ConnectionClosedOK:
-            print("CONNECTION (DASHBOARD) CLOSED, NO RADIO CONNECTION WAS MADE")
 
-    def pause_reading(self):
-        # This will stop the callbacks to data_received
-        self.transport.pause_reading()
-
-    def resume_reading(self):
-        # This will start the callbacks to data_received again with all data that has been received in the meantime.
-        self.transport.resume_reading()
-"""
-
+#Assumed format of main data string: timestamp [0], x [1], y [2], z [3], battVolt [4], temp [5], press [6], speed [7], acceleration [8]
 async def radio_handler(websocket):
-    reader, writer = await serial_asyncio.open_serial_connection(url='COM3', baudrate=115200)
+    print ("INFO: ATTEMPTING CONNECTION, WILL SHOW MESSAGE IF CONNECTED", flush = True)
+
+    reader, writer = await serial_connect()
+
     while True:
         try:
             line = await reader.readline()
             parsed = str(line, 'utf-8')
             parsed = parsed.split("\n")
-            print(parsed)
+            #print(parsed, flush = True)
+            parsed = parsed[0].split(", ")
+            #print(parsed, flush = True)
             
-            """
-            ['------------------------------------------------\r', '']
-            ['Packet: VE3SOH>GROUND:PKT=1586,ALT=9144.0m,BAT=4.05V\r', '']
-            ['Callsign: VE3SOH\r', '']
-            ['Packet #: 1586\r', '']
-            ['RSSI: -22 dBm\r', '']
-            ['SNR: 13 dB\r', '']
-            ['Freq Error: -643 Hz\r', '']
-            """
-
-            """
             data = {
-                "alt": float(0),
-                "velocity": float(0),
-                "timestamp": float(0),
-                "acceleration": float(0),
-                "pressure": float(0),
+                "alt": float(parsed[3]),
+                "velocity": float(parsed[7]),
+                "timestamp": float(parsed[0]),
+                "acceleration": float(parsed[8]),
+                "pressure": float(parsed[6]),
                 "state": ("test").strip(),
-                "position": {'x': float(0),
-                            'y': float(0),
-                            'z': float(0)},
+                "position": {'x': float(parsed[1]),
+                            'y': float(parsed[2]),
+                            'z': float(parsed[3])},
                 "quaternion": {'x': 0,
                 'y': 0.707,
                 'z': -0.707,
                 'w': 0},
 
-                "battVolt": float(0),
-                "drogVolt": float(0),
-                "temp": float(0),
-                "mainVolt": -1,
+                "battVolt": float(parsed[4]),
+                "drogVolt": float(-1000),
+                "temp": float(parsed[5]),
+                "mainVolt": -1000,
             }
-            """
-            #print("sending (Sleeptime): " + str(total_sleep_time) )
-            #await websocket.send(json.dumps(data))
+
+            await websocket.send(json.dumps(data))
+
 
         except ConnectionClosedOK:
-            print("CONNECTION (DASHBOARD) CLOSED, NO RADIO CONNECTION WAS MADE")
-            break
-        
-
-"""
-async def radio_handler(websocket):
-    ####    initilization    ####
-    loop = asyncio.get_event_loop()
-
-    i =0 
-    count = 0
-    #uno = serial.Serial(port,115200)
-    flag=True
-    radio_connect = True
-    radio_connect2 = False
-
-    rx_command = False
-    #while True:
-    print("MAKING CONNECT ATTEMPT " + port + "\n")
-
-    while True:
-        try:
-            #radio =serial.Serial(port=port,baudrate=baud)
-            print("READING...")
-            transport, protocol = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, 'COM3', baudrate=115200)
-            print("CONNECTED...")
-            while True:
-                await asyncio.sleep(0.3)
-                #print("MSG RECIEVED...")
-                protocol.resume_reading()
-                print(transport.rea)
-            break
-        except ConnectionClosedOK:
-            print("CONNECTION (DASHBOARD) CLOSED, NO RADIO CONNECTION WAS MADE")
+            print("INFO: CONNECTION (DASHBOARD) CLOSED", flush = True)
             break
         except Exception as e:
-            print("FAILED AT INITIAL CONNECT, WILL NOT MAKE ANOTHER ATTEMPT" + "\n")
-            print(e)
-            radio_connect = True
-            #exit(-1)
-            await asyncio.sleep(1)
-"""   
 
-"""
-async def radio_handler(websocket):
-    ####    initilization    ####
-    i =0 
-    count = 0
-    #uno = serial.Serial(port,115200)
-    flag=True
-    radio_connect = True
-    radio_connect2 = False
-
-    rx_command = False
-    #while True:
-    print("MAKING CONNECT ATTEMPT " + port + "\n")
-
-    while True:
-        try:
-            #radio =serial.Serial(port=port,baudrate=baud)
-            print("CONNECTING...")
-            radio = await open_serial_connection(None, None,'COM4',baudrate=baud)
-            radio_connect = True
-            break
-        except ConnectionClosedOK:
-            print("CONNECTION (DASHBOARD) CLOSED, NO RADIO CONNECTION WAS MADE")
-            break
-        except Exception as e:
-            print("FAILED AT INITIAL CONNECT, WILL NOT MAKE ANOTHER ATTEMPT" + "\n")
-            print(e)
-            radio_connect = True
-            #exit(-1)
-            await asyncio.sleep(1)
-            
-        
-        
-
-    while (radio_connect == True):
-        
-        try:
-            print("CONNECTED" + "\n")
-
-            #byteInWait = radio._RadioSerialBuffer.inWaiting()
-            data_str = await radio.readline().strip().decode("utf-8") #write a string
-            
-            if (data_str==None):
-                print("no data in")
-            else: # TRANSMIT TO GUI VIA WEBSOCKET
-                print (data_str)
-                await websocket.send(json.dumps("TEST"))
-                #self.populatefileradio(data_str)
-
-                #data_str= data_str.split('\n')
-                #print("data is %s " % data_str[0])
-                #print("# bytes in wait: %d \n" % byteInWait)
-                await asyncio.sleep(1)
-                print('...\n')
-                
-        except ConnectionClosedOK:
-            print("CONNECTION (DASHBOARD) CLOSED, RADIO CONNECTION WAS MADE")
-            break
+            writer.close()
+            match (str(e)):
+                case "ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))":
+                    print("ERR: Serial Communication device disconnected, will make another attempt to reconnect", flush = True)
 
 
-    print("CLOSING TRANSMMISSION")
+                    reader, writer = await serial_connect()
+                    print ("SUCCESS: successful reconnect, returning to main loop", flush = True)
 
-    pass
+                case _:
+                    print("ERR: unknown error, fuck if i know: " + str(e), flush = True)
+
+#pass some fake shit in when ussing the standalone moc test
+class fake_websocket():
+    async def send(*args):
+        return 
     
-"""
-
-#for testing with radio without async
-def radiorun():
-
-    i =0 
-    count = 0
-    #uno = serial.Serial(port,115200)
-    flag=True
-    radio_connect = True
-    radio_connect2 = False
-
-    rx_command = False
-    while True:
-        print("MAKING CONNECT ATTEMPT" + "\n")
-
-        try:
-            radio =serial.Serial(port=port,baudrate=baud)
-            radio_connect = True
-            break
-
-        except Exception as e:
-            print("FAILED AT INITIAL CONNECT" + "\n")
-            print()
-            #print(e)
-            radio_connect = False
-            exit(-1)
-
-
-    #print("Connected")
-
-    #filedescriptors = termios.tcgetattr(sys.stdin) # retrieves current terminal settings 
-    #tty.setcbreak(sys.stdin) # allows for single character commands in terminal ; RAW mode instead of COOKED  mode
-    #tty and termios make sure terminal reads the key inputs 
-
-    while (radio_connect == True):
-        
-        
-        #byteInWait = radio._RadioSerialBuffer.inWaiting()
-
-        data_str= radio.readline().strip().decode("utf-8") #write a string
-        
-        if (data_str==None):
-            print("no data in")
-
-            
-        else:
-            print (data_str)
-            #self.populatefileradio(data_str)
-
-
-            #data_str= data_str.split('\n')
-            #print("data is %s " % data_str[0])
-            #print("# bytes in wait: %d \n" % byteInWait)
-            t.sleep(0.1)
-            '''
-            if (data_str[0] == 'idle'):
-                start=t.time()
-                while True:
-                    end=t.time()
-                    timer=end-start
-                    if keyboard.is_pressed('space'):
-                        rx_command = True
-                        print("sending launch command \n") 
-                        t.sleep(1)
-                        flag=False
-                        break
-                    elif (timer>2):
-                        rx_command= False
-                        break
-            if flag==False:
-                break
-            
-            else:
-                #t.sleep(0.5)
-                print("data command is: %s\n"% data_str[0]) 
-                radio.sendCommand("launch\n")
-                print("launch command sent\n")
-                t.sleep(1)
-                if keyboard.is_pressed('D'):
-                    t.sleep(1)
-                    print("exitting connect loop \n")
-                    break
-            '''
-
-
-
-
-
-
 def mock_serial_test():
-    asyncio.run(radio_handler(None))
+    asyncio.run(radio_handler(fake_websocket()))
     #radiorun()
     pass
 
 if __name__ == "__main__":
-    print ("performing mock serial")
+    print ("performing mock serial", flush = True)
     mock_serial_test()

@@ -1,8 +1,11 @@
 import React from "react";
-import { useState } from "react";
+import { useStat, useEffect, useState } from "react";
 import { useTheme } from "../../styles/ThemeContext.jsx";
 
 import Button from "../../components/Button.jsx";
+
+
+import { listen } from '@tauri-apps/api/event';
 
 function formatValue(value, unit) {
   if (value == null) return "—";
@@ -12,11 +15,19 @@ function formatValue(value, unit) {
 }
 
 export function TerminalPanel({ consoleLogs, stdLogs, fullWidth }) {
+
+
+
   const { tokens: ui, styles: uiStyles } = useTheme();
   const dash = uiStyles.telemetryDashboard;
 
-
   const [showWebserverStd, setShowWebserverStd] = useState (false);
+
+    useEffect(() => {
+        console.log(stdLogs);
+        console.log(consoleLogs);
+      }
+      ,[stdLogs, consoleLogs]);
 
 
   return (
@@ -40,12 +51,12 @@ export function TerminalPanel({ consoleLogs, stdLogs, fullWidth }) {
 
       <div style={dash.terminal}>
         {showWebserverStd === true ? 
-          stdLogs.map((i, log) => {
+          stdLogs.map((log, i) => {
             return (
-              <div key={i} style={{ marginBottom: "2px", whiteSpace: "nowrap" }}>
-                <span style={{ opacity: 0.6 }}>[{i}]</span>
-                  <>{" "}
-                    log
+              <div key={stdLogs.length-i} style={log.toString().includes("ERR:") === true ? {color:'red', marginBottom: "2px", whiteSpace: "nowrap" } : (log.toString().includes("SUCCESS:") === true ? {color:'green', marginBottom: "2px", whiteSpace: "nowrap" } : {color:'gray', marginBottom: "2px", whiteSpace: "nowrap" })}>
+                <span style={{ opacity: 0.6 }}>[STDOut#:{stdLogs.length-i}]</span>
+                  <> {" "}
+                    {log}
                   </>
               </div>
             )

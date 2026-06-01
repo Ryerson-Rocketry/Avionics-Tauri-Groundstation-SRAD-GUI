@@ -112,6 +112,10 @@ const DEFAULT_CHART_INTERVAL_SEC = 1;
 
 //where dummy mode = don't actually run the thing
 export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMode, dummyMode) {
+
+
+  
+
   const chartIntervalSec = Math.max(0.1, Number(options.chartUpdateIntervalSeconds) || DEFAULT_CHART_INTERVAL_SEC);
   const chartIntervalMs = chartIntervalSec * 1000;
   const recordingSaveDirName = options.recordingSaveDirName ?? null;
@@ -216,6 +220,12 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
   const [consoleLogs, setConsoleLogs] = useState([]);
   //python webserver std out/err longs
   const [stdLogs, setStdLogs] = useState([]);
+
+
+
+  
+
+  
 
   const [stats, setStats] = useState({
     
@@ -368,6 +378,13 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
     }
 
     let socket = socketOBJ;
+
+    const unlisten = listen('stdout', (event) => {
+      console.log(
+        `recieved STDOUT as ${event.payload}`
+      );  
+      setStdLogs((prev) => [event.payload, ...prev].slice(0, 50));
+    });
 
     socket.onmessage = (event) => {
       try {
@@ -557,6 +574,9 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
       flushRecording();
       //moved to new use effect hook
       //if (socket) socket.close();
+
+      console.log("unmounting telemetry function, preparing to remove listener to backend "); 
+      unlisten.then( f => f() ); //https://github.com/tauri-apps/tauri/pull/8930
     };
   }, [isLive, socketUrl, flushRecording, socketOBJ, dummyMode]);
 

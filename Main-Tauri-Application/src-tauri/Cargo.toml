@@ -26,3 +26,16 @@ chrono = { version = "0.4", features = ["serde"] }
 local-ip-address = "0.6.10"
 tauri-plugin-shell = "2"
 
+[profile.1]         # Modify profile settings via config.
+inherits = "dev"         # Inherits settings from [profile.dev].
+opt-level = 0            # Optimization level.
+debug = true             # Include debug info.
+split-debuginfo = '...'  # Debug info splitting behavior.
+strip = "none"           # Removes symbols or debuginfo.
+debug-assertions = true  # Enables debug assertions.
+overflow-checks = true   # Enables runtime integer overflow checks.
+lto = false              # Sets link-time optimization.
+panic = 'unwind'         # The panic strategy.
+incremental = true       # Incremental compilation.
+codegen-units = 4       # Number of code generation units.
+rpath = false            # Sets the rpath linking option.
