@@ -12,6 +12,7 @@ from websockets.exceptions import ConnectionClosedOK
 
 import serial.tools.list_ports #https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python 
 
+#TODO: Check if
 async def serial_connect():
     while(True):
         try:
@@ -21,7 +22,6 @@ async def serial_connect():
             reader, writer = await serial_asyncio.open_serial_connection(url=port, baudrate=115200)
             print ("SUCCESS: SERIAL CONNECTION MADE. Redirecting back to main serial data read loop", flush = True)
             return reader, writer
-            break
         except Exception as e:
             print("ERR: failed to find radio reciever device, trying again...", flush = True)
             ports = serial.tools.list_ports.comports()
@@ -58,6 +58,11 @@ async def radio_handler(websocket):
                 'y': 0.707,
                 'z': -0.707,
                 'w': 0},
+
+                "orientation": {'pitch': 30,
+                'roll': 20,
+                'yaw': 20,
+                },
 
                 "battVolt": float(parsed[4]),
                 "drogVolt": float(-1000),

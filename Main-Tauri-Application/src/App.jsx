@@ -4,14 +4,21 @@ import MainMenu from "./main-menu/MainMenu.jsx";
 import TelemetryDashboardPage from "./telemetry-dashboard/TelemetryDashboardPage.jsx";
 import ReplayDashboardPage from "./telemetry-dashboard/ReplayDashboardPage.jsx";
 import { ErrorBoundary } from "./components/ErrorBoundary.jsx";
-import { ThemeProvider } from "./styles/ThemeContext.jsx";
+import { ThemeProviderCustom} from "./styles/ThemeContext.jsx";
 import "./App.css";
 
 import { Command } from '@tauri-apps/plugin-shell';
 import { resolveResource } from '@tauri-apps/api/path';
 
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function App() {
   const [appConfig, setAppConfig] = useState(null);
@@ -154,8 +161,10 @@ function App() {
   }
 
   return (
-    <ThemeProvider initialTheme={initialTheme}>
-      {content}
+    <ThemeProvider theme={darkTheme}>
+      <ThemeProviderCustom initialTheme={initialTheme}>
+        {content}
+      </ThemeProviderCustom>
     </ThemeProvider>
   );
 }

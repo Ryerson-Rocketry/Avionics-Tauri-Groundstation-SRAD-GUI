@@ -6,23 +6,43 @@ import { GpsScene } from "../simulator/GpsScene.jsx";
 import Button from "../../components/Button.jsx";
 
 import TelemetrCesiumScene from "../simulator/TelemetryCesiumScene.jsx";
+import { Altimeter } from "./Altimeter.jsx";
 
 export const DEFAULT_ZOOM_GPS = 14;
 export const ZOOM_MIN_GPS = 12;
 export const ZOOM_MAX_GPS = 20;
 
+export const DEFAULT_GROUNDLEVEL = 0;
+export const GROUNDLEVEL_MAX = 1000;
+export const GROUNDLEVEL_MIN = -1000;
+
+import rocketMarker from "../../../assets/map/rocket_marker.png";
+import apogeeMarker from "../../../assets/map/apogee_marker.png";
+import launchMarker from "../../../assets/map/launch_marker.png";
+import Typography from "@mui/material/Typography";
 
 export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
   const { tokens: ui, styles: uiStyles } = useTheme();
   const dash = uiStyles.telemetryDashboard;
 
   const [gpsZoomLevel, setGpsZoomLevel] = useState(DEFAULT_ZOOM_GPS);
+
   const [reconstructionZoomLevel, setRecontructionZoomLevel] = useState(DEFAULT_ZOOM);
+  const [groundLevelOffset, setGroundLevelOffset] = useState(DEFAULT_GROUNDLEVEL);
 
   const [reconstructionUpdateSpeed, setReconstructionUpdateSpeed] = useState(1);
 
   const[mapState, setMapState] = useState(false); //false 3d map/true 2d map
   const[satView, setSatView] = useState(true);
+
+
+  //component control states
+  const[showLegend, setShowLegend] = useState(true);
+  const[showAlitimeter, setShowAltimeter] = useState(true);
+
+  //map specific component control states
+  const[showLabel, setShowLabel] = useState(false);
+  const[showPath, setShowPath] = useState(true);
 
   //TEMP
   const styles = uiStyles.telemetryDashboard;
@@ -30,35 +50,26 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
 
   const [simOffset, setSimOffset] = useState({x: 0, y: 0, z:0});
 
-  const [moddedRocketPos, setModdedRocketPos] = useState(rocketPos);
+  const [moddedRocketPos, setModdedRocketPos] = useState(rocketPos.current); //unused
 
   //For dealing with resetting visualizer to 0,0,0 (in case telemetry sensors read smth different)
   function onOffset(){
-    console.log("Calibrating:" + rocketPos.y  + rocketPos.z  + rocketPos.x);
-    setSimOffset(rocketPos);
+    console.log("UNUSED:");
   }
 
   useEffect(() => {
-      var temp = rocketPos;
-      if (simOffset != {x: 0, y: 0, z:0}){
-        var temp = telemetry.pos;
-        console.log("Calibrating:" + rocketPos.y + " " + rocketPos.z + " "   + rocketPos.x);
-        
-        temp.x = rocketPos.x - simOffset.x;
-        temp.y = rocketPos.y - simOffset.y;
-        temp.z = rocketPos.z - simOffset.z;
-
-        //temp until map scale is properly adjusted (given that rocket can move 1000+ m upwards)
-      }
-
-      temp.y = temp.y/10;
-      setModdedRocketPos(temp);
+      //console.log("COORDS" + rocketPos.current.x +  ", " +  rocketPos.current.z);
+      //console.log("COORDSAPOGEE" + rocketPos.apogeePoint.x +  ", " +  rocketPos.apogeePoint.z);
     }
-    ,[telemetry]);
+    ,[telemetry, rocketPos]);
 
   return (
     <section style={{ gridColumn: "1", gridRow: "1", display: "flex", height:"70vh" /*, borderColor: "aqua", borderStyle: "dashed" */ }}>
+
+
+
       <div style={{ ...dash.glassPane, flex: 1, display: "flex", flexDirection: "column" }}>
+
         <div style={{ ...dash.cardHeader, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
           <span>SPATIAL RECONSTRUCTION</span>
           {isLocked && (
@@ -110,14 +121,13 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
           </Button>
 
             <div style={{ display: "flex", alignItems: "center", gap: "0.8vw" }}>
-              <label style={{ fontSize: "10px", letterSpacing: "1px", color: "rgba(159, 168, 175, 0.9)" }}>3D Map Update Speed</label>
+              <label style={{ fontSize: "10px", letterSpacing: "1px", color: "rgba(159, 168, 175, 0.9)" }}>Altitude Offset</label>
               <input
                 type="range"
-                disabled
-                min={1}
-                max={5}
-                value={reconstructionUpdateSpeed}
-                onChange={(e) => setReconstructionUpdateSpeed(Number(e.target.value))}
+                min={GROUNDLEVEL_MIN}
+                max={GROUNDLEVEL_MAX}
+                value={groundLevelOffset}
+                onChange={(e) => setGroundLevelOffset(Number(e.target.value))}
                 style={{
                   width: "100px",
                   accentColor: "rgba(73, 238, 242, 0.9)",
@@ -125,38 +135,98 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
                 }}
               />
               <span style={{ fontFamily: "monospace", fontSize: "10px", color: "rgba(159, 168, 175, 0.9)", minWidth: 28 }}>
-                {reconstructionUpdateSpeed}
+                {groundLevelOffset} (M)
               </span>
             </div>
 
           <Button size="sm" variant="outline" outlineColor={ui.colors.red} textColor={ui.colors.red} onClick={() => setMapState(!mapState)}>
-              {mapState === true ? 'Show 2D Map' : 'Show 3D Reconstruction'}
+              {mapState === true ? '2D Map' : '3D Map'}
           </Button>
+
+            <Button  size="sm" variant="outline" outlineColor={showLabel === false ? ui.colors.red: ui.colors.green} textColor={showLabel === false ? ui.colors.red: ui.colors.green} onClick={() => setShowLabel(!showLabel)}>
+              Labels
+          </Button>
+
+          <Button  size="sm" variant="outline" outlineColor={showPath === false ? ui.colors.red: ui.colors.green} textColor={showPath === false ? ui.colors.red: ui.colors.green} onClick={() => setShowPath(!showPath)}>
+              Path
+          </Button>
+
+          <Button  size="sm" variant="outline" outlineColor={showLegend === false ? ui.colors.red: ui.colors.green} textColor={showLegend === false ? ui.colors.red: ui.colors.green} onClick={() => setShowLegend(!showLegend)}>
+            Legend
+          </Button>
+          
+          <Button  size="sm" variant="outline" outlineColor={showAlitimeter === false ? ui.colors.red: ui.colors.green} textColor={showAlitimeter === false ? ui.colors.red: ui.colors.green} onClick={() => setShowAltimeter(!showAlitimeter)}>
+            Altimeter
+          </Button>
+
         </div>
 
 
 
+        
 
 
-        <div style={{ flex: 2, minHeight: 0 }}>
+        <div style={{ flex: 2, minHeight: 0, position: 'relative' }}>
+          
+          {showLegend === true 
+            ?
+            <div style={{ ...dash.glassPane,  padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", right: 0, top: 0, marginTop: "auto",marginBottom: "auto", zIndex:1000 }}>
+              <Typography> Legend </Typography>
+              <div style={{display: 'flex', flexDirection:'row'}}>
+                  <img src={rocketMarker} height={20} width={20}/>
+                  <Typography> = Rocket </Typography> 
+              </div>
+              <div style={{display: 'flex', flexDirection:'row'}}>
+                  <img src={apogeeMarker} height={20} width={20}/>
+                  <Typography> = Apogee Point </Typography> 
+              </div>
+              <div style={{display: 'flex', flexDirection:'row'}}>
+                  <img src={launchMarker} height={20} width={20}/>
+                  <Typography> = Launch Site </Typography> 
+              </div>
+            </div>
+            :
+            []
+          }
+
+          {showAlitimeter === true 
+            ?
+            <div style={{ ...dash.glassPane,  height: "50%", padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", left: 0, bottom: 0,top: 0, marginTop: "auto",marginBottom: "auto", zIndex:1000 }}>
+              {rocketPos.apogeePoint.y < 3000 ? 3000 : (rocketPos.apogeePoint.y + rocketPos.apogeePoint.y*0.05).toFixed()} m
+              <Altimeter rocketPos={rocketPos} maxSliderValue={3000}/>
+              0 m
+            </div>
+            :
+            []
+          }
+        
           {mapState === true ?
           <div>
             <TelemetrCesiumScene
               telemetry={telemetry}
               history={history}
-              rocketPos={moddedRocketPos}
+              rocketPos={rocketPos}
               isTrackOn={isLocked}
+              groundLevelOffset={groundLevelOffset}
+              satView={satView}
               darkMode={true}
               bgColor="rgba(5,5,8,0.95)"
               zoomDistance={reconstructionZoomLevel}
+
+              showPath={showPath}
+              showLabel={showLabel}
             />
-            <div style={{ width: "25%", height: "25%", position: "absolute", bottom: 10, right: 10, zIndex:100 }}> 
-              <GpsScene satView={satView} targetPos = {rocketPos} zoom = {15}></GpsScene>  
+            <div style={{ ...dash.glassPane, width: "25%", height: "25%", position: "absolute", bottom: 10, right: 10, zIndex:100, borderStyle: 'solid', borderWidth: '10px' }}> 
+
+                <GpsScene satView={satView} targetPos = {rocketPos} zoom = {gpsZoomLevel} showLabel={showLabel} showPath={showPath}></GpsScene>  
+      
             </div>
+
+
           </div>
           
           :
-          <GpsScene satView={satView} targetPos={rocketPos} zoom={gpsZoomLevel}/>
+          <GpsScene satView={satView} targetPos={rocketPos} zoom={gpsZoomLevel} showLabel={showLabel} showPath={showPath}/>
           }
           
         </div>

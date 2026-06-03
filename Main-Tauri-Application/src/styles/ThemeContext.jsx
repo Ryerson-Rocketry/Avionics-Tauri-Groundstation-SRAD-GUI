@@ -9,7 +9,7 @@ const ThemeContext = createContext({
   availableThemes: listThemes(),
 });
 
-export function ThemeProvider({ initialTheme = "dark", children }) {
+export function ThemeProviderCustom({ initialTheme = "dark", children }) {
   const [name, setName] = useState(initialTheme || "dark");
   const theme = useMemo(() => getTheme(name), [name]);
 

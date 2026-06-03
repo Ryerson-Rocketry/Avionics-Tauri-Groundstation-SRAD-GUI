@@ -99,6 +99,9 @@ function getByPath(obj, path) {
   return path.split(".").reduce((o, k) => (o != null ? o[k] : undefined), obj);
 }
 
+function clamp(number, lower, upper) {
+  return Math.min(Math.max(number, lower), upper)
+}
 
 const DEFAULT_CHART_INTERVAL_SEC = 1;
 
@@ -157,8 +160,8 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
     vel: 0,
     status: "DISCONNECTED",
     time: 0,
-    pos: { x: 0, y: 0, z: 0 },
-    quat: { x: 0, y: 0, z: 0, w: 1 },
+    pos: { x: 0, y: 0, z: 0 }, //x = lat, z = long , y = alt
+    quat: { x: 0, y: 0, z: 0, w: 1 }, //UNUSED, IGNORE
 
 
     pressure: 0,
@@ -167,7 +170,15 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
     temp: 0,
     battVolt: 0,
     mainVolt: 0,
-    drogueVolt: 0
+    drogueVolt: 0,
+
+    //rocket orientation shit
+    orientation: {
+      pitch: 0,
+      roll: 0, 
+      yaw: 0 //technically also heading? idk
+    }
+
   });
 
   const [history, setHistory] = useState([]);
@@ -225,7 +236,12 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
 
   
 
-  
+  const [rocketPos, setRocketPos] = useState({
+    all: [],
+    current: {x: 0, y: 0, z: 0},
+    apogeePoint: {x: 0, y: 0, z: 0},
+    launchPoint: {x: 0, y: 0, z: 0}
+  })
 
   const [stats, setStats] = useState({
     
@@ -293,7 +309,9 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
     mainVolt: 0,
     drogueVolt: 0,
 
-    metadata: statsMetaData
+    metadata: statsMetaData,
+
+    apogee: 0
   });
 
   const [lastCloseReason, setLastCloseReason] = useState(null);
@@ -395,7 +413,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
           vel: raw.velocity ?? 0,
           status: raw.state || "IDLE",
           time: raw.timestamp || 0,
-          pos: raw.position || { x: 0, y: 0, z: 0 },
+          pos: {x: clamp(raw.position.x, -90, 90), y: raw.position.y, z: clamp(raw.position.z, -180, 180) } || { x: 0, y: 0, z: 0 },
           quat: raw.quaternion || { x: 0, y: 0, z: 0, w: 1 },
 
           //NEW ROWS
@@ -406,6 +424,14 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
           battVolt: raw.battVolt ?? 0,
           mainVolt: raw.mainVolt ?? 0,
           drogueVolt: raw.drogueVolt ?? 0,
+
+          battVolt: raw.battVolt ?? 0,
+          mainVolt: raw.mainVolt ?? 0,
+          drogueVolt: raw.drogueVolt ?? 0,
+
+          orientation: {pitch: clamp(raw.orientation.pitch, -90, 90), roll: clamp(raw.orientation.roll, 0, 360), yaw: clamp(raw.orientation.yaw, 0, 360) } || { pitch: 0, roll: 0, yaw: 0 },
+          
+          
         };
 
         setTelemetry(processed);
@@ -487,7 +513,14 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
         }
         setConsoleLogs((prev) => [logEntry, ...prev].slice(0, 50));
 
-        
+        setRocketPos((prev) => ({
+          ...prev,
+          all: [...prev.all, processed.pos
+          ],
+          current: {x: processed.pos.x, y: processed.pos.y, z: processed.pos.z},
+          apogeePoint: prev.current.y < processed.pos.y ? {x: processed.pos.x, y: processed.pos.y, z: processed.pos.z} : prev.apogeePoint, //use prev apogee point if new apogee point not reached
+          launchPoint: prev.launchPoint.x === 0 ? {x: processed.pos.x, y: processed.pos.y, z: processed.pos.z} : prev.launchPoint, //set launch point as first point
+        }));
 
         setStats((prev) => ({
           ...prev,
@@ -545,7 +578,13 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
           mainVolt: processed.mainVolt,
           drogueVolt: processed.drogueVolt,
 
-          metadata: prev.metadata 
+          
+
+          metadata: prev.metadata,
+
+          apogee: Math.max(prev.apogee, processed.alt), //ALREADY JUST MAX ALT BUT WHATEVER
+
+          
         }));
         
         //console.log(hasRunOnceRef.current );
@@ -583,7 +622,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
   return {
     telemetry,
     history,
-    rocketPos: telemetry.pos,
+    rocketPos,
     chartData,
     consoleLogs,
     stdLogs,

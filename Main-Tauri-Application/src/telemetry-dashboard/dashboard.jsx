@@ -159,6 +159,7 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
       <HeaderBar
         mission={mission}
         telemetry={telemetry}
+        stats={stats}
         isLive={!replay && isLive}
         isFinished={isFinished}
         isLocked={isLocked}

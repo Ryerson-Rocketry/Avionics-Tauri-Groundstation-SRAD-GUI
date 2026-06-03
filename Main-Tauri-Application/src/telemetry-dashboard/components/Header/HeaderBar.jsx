@@ -30,6 +30,7 @@ function HeaderStat({ label, val, unit, isString }) {
 export function HeaderBar({
   mission,
   telemetry,
+  stats,
   isLive,
   isFinished,
   isLocked,
@@ -85,6 +86,10 @@ export function HeaderBar({
           <div style={{ fontFamily: ui.font.googleSans, fontSize: ui.text.xs, color: ui.colors.gray, letterSpacing: "1px" }}>
             {isConnected ? labels.telemetry.streamConnected : lastCloseReason ? `Disconnected: ${lastCloseReason}` : labels.telemetry.streamDisconnected}
           </div>
+          <div style={{ fontFamily: ui.font.googleSans, fontSize: ui.text.xs, color: ui.colors.gray, letterSpacing: "1px" }}>
+            MISSION STATE: {telemetry.stateName}
+          </div>
+          
         </div>
       </div>
         
@@ -118,13 +123,19 @@ export function HeaderBar({
 
       <Divider variant="middle" orientation="vertical"  style={{backgroundColor: "gray", marginRight: 4}} flexItem height={30}  />
 
-      <div style={{ display: "flex", gap: "1vw" }}>
-        
-        <HeaderStat label={labels.telemetry.statAltitude} val={telemetry.alt} unit="m" isString={false} />
-        <HeaderStat label={labels.telemetry.statVelocity} val={telemetry.vel} unit="m/s" isString={false} />
-        {/*<HeaderStat label={labels.telemetry.statMissionTime} val={telemetry.time} unit="s" isString={false} />*/}
-        <HeaderStat label={labels.telemetry.statMissionState} val={telemetry.stateName} unit="" isString={true}/>
-        
+      <div style={{ display: "flex",  flexDirection:"column" , alignItems: "center" }}>
+        <div style={{ display: "flex",  alignItems: "center", gap: "1vw"}}>
+          <HeaderStat label={labels.telemetry.statAltitude} val={telemetry.alt} unit="m" isString={false} />
+          <HeaderStat label={labels.telemetry.statVelocity} val={telemetry.vel} unit="m/s" isString={false} />
+          {/*<HeaderStat label={labels.telemetry.statMissionTime} val={telemetry.time} unit="s" isString={false} />*/}
+          <HeaderStat label={"ACCELERATION"} val={telemetry.acceleration} unit="m/s^2" isString={false}/>
+        </div>
+        <div style={{ display: "flex",  alignItems: "center", gap: "1vw"}}>
+          <HeaderStat label={"APOGEE"} val={stats.apogee} unit="m" isString={false} />
+          <HeaderStat label={"PITCH"} val={telemetry.orientation.pitch} unit="°" isString={false} />
+          <HeaderStat label={"ROLL"} val={telemetry.orientation.roll} unit="°" isString={false} />
+          <HeaderStat label={"YAW"} val={telemetry.orientation.yaw} unit="°" isString={false} />
+        </div>  
       </div>
 
       <Divider variant="middle" orientation="vertical"  style={{backgroundColor: "gray"}} flexItem height={30}  />

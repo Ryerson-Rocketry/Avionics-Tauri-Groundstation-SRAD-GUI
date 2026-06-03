@@ -24,8 +24,8 @@ export function TerminalPanel({ consoleLogs, stdLogs, fullWidth }) {
   const [showWebserverStd, setShowWebserverStd] = useState (false);
 
     useEffect(() => {
-        console.log(stdLogs);
-        console.log(consoleLogs);
+        //console.log(stdLogs);
+        //console.log(consoleLogs);
       }
       ,[stdLogs, consoleLogs]);
 

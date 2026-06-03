@@ -114,27 +114,34 @@ async def rocketry_data_file_test_handler(websocket):
     while len(dat) > 2:
         try:
             row = dat.pop(0)
-            data = {
-                "alt": float(row['altitude']),
-                "velocity": float(row['speed']),
-                "timestamp": float(row['time']),
-                "acceleration": float(row['acceleration']),
-                "pressure": float(row['pressure']),
-                "state": (row['state_name']).strip(),
-                "position": {'x': float(row['latitude']),
-                            'y': float(row['altitude']),
-                            'z': float(row['longitude'])},
-                "quaternion": {'x': 0,
-                'y': 0.707,
-                'z': -0.707,
-                'w': 0},
 
-                "battVolt": float(row['battery_voltage']),
-                "drogVolt": float(row['drogue_voltage']),
-                "temp": float(row['temperature']),
-                "mainVolt": float(row['main_voltage']),
-            }
-            #print("sending (Sleeptime): " + str(total_sleep_time) )
+            if (row['longitude'] != "-77.1476655"): #crackhead data keeps jumping to end point for some reason
+                data = {
+                    "alt": float(row['altitude']),
+                    "velocity": float(row['speed']),
+                    "timestamp": float(row['time']),
+                    "acceleration": float(row['acceleration']),
+                    "pressure": float(row['pressure']),
+                    "state": (row['state_name']).strip(),
+                    "position": {'x': float(row['latitude']),
+                                'y': float(row['altitude']),
+                                'z': float(row['longitude'])},
+                    "quaternion": {'x': 0,
+                    'y': 0.707,
+                    'z': -0.707,
+                    'w': 0},
+
+                    "orientation": {'pitch': 30,
+                    'roll': 20,
+                    'yaw': 20,
+                    },
+
+                    "battVolt": float(row['battery_voltage']),
+                    "drogVolt": float(row['drogue_voltage']),
+                    "temp": float(row['temperature']),
+                    "mainVolt": float(row['main_voltage']),
+                }
+                #print("sending (Sleeptime): " + str(total_sleep_time) )
 
 
             #default sleep time

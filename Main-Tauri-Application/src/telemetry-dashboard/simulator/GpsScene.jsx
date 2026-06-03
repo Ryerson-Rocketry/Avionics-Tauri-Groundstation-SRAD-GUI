@@ -7,27 +7,38 @@ import { ZOOM_MIN, ZOOM_MAX, DEFAULT_ZOOM } from "./TelemetryScene.jsx";
 import { MapContainer } from 'react-leaflet/MapContainer'
 import { TileLayer } from 'react-leaflet/TileLayer'
 import { useMap } from 'react-leaflet/hooks'
-import { Marker } from "react-leaflet";
+import { Marker, Polyline, Tooltip } from "react-leaflet";
 
-import rocketMarker from "../../../assets/map/normal_marker.png";
-import launchMarker from "../../../assets/map/star_marker.png";
+import rocketMarker from "../../../assets/map/rocket_marker.png";
+import apogeeMarker from "../../../assets/map/apogee_marker.png";
+import launchMarker from "../../../assets/map/launch_marker.png";
 
 import { ZOOM_MAX_GPS, ZOOM_MIN_GPS } from "../components/SimViewPanel.jsx";
+
+import "./GpsScene.css";
 
 var rocketIcon = L.icon({
     iconUrl: rocketMarker,
 
-    iconSize:     [45, 45], // size of the icon
-    iconAnchor:   [22, 35], // point of the icon which will correspond to marker's location
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    iconSize:     [25, 25], // size of the icon
+    iconAnchor:   [12.5,12.5], // point of the icon which will correspond to marker's location
+    tooltipAnchor:  [0, 12.5] // point from which the popup should open relative to the iconAnchor
+});
+
+var apogeeIcon = L.icon({
+    iconUrl: apogeeMarker,
+
+    iconSize:     [50,50], // size of the icon
+    iconAnchor:   [25, 25], // point of the icon which will correspond to marker's location
+    tooltipAnchor:  [0, -25] // point from which the popup should open relative to the iconAnchor
 });
 
 var launchIcon = L.icon({
     iconUrl: launchMarker,
 
-    iconSize:     [45, 45], // size of the icon
-    iconAnchor:   [22, 35], // point of the icon which will correspond to marker's location
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    iconSize:     [25, 25], // size of the icon
+    iconAnchor:   [12.5, 12.5], // point of the icon which will correspond to marker's location
+    tooltipAnchor:  [0, 12.5] // point from which the popup should open relative to the iconAnchor
 });
 
 function MapRecenter({ coords }) {
@@ -52,13 +63,25 @@ const OSM_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const OSM_ATTRIB = '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 
-export function GpsScene({targetPos, zoom, satView}) {
+export function GpsScene({targetPos, zoom, satView, showLabel, showPath}) {
     const [map, setMap] = useState(undefined); 
+    const [rocketPath, setRocketPath] = useState ([]);
+
+    useEffect(() => {
+        //var mapped = targetPos.map(item => ({ ["x"]: item.value }) );
+
+        var temp = [];
+        for (var i = 0; i < targetPos.all.length; i++){
+          temp.push([targetPos.all[i].x, targetPos.all[i].z]);
+        }
+        setRocketPath(temp);
+      }
+      ,[targetPos]);
 
     return (
         <MapContainer
         style={{ width: '100%', height: '100%' }}
-        center={[targetPos.x, targetPos.y]}
+        center={[targetPos.current.x, targetPos.current.y]}
         zoom={zoom}
         maxZoom={ZOOM_MAX_GPS}
         minZoom={ZOOM_MIN_GPS}
@@ -73,9 +96,32 @@ export function GpsScene({targetPos, zoom, satView}) {
             url={satView === true ? ESRI_URL : OSM_URL}
         />
             
-            <MapRecenter coords={{lat: targetPos.x, lng: targetPos.z}} />
+            <MapRecenter coords={{lat: targetPos.current.x, lng: targetPos.current.z}} />
             <MapZoom zoom={zoom}/>
-            <Marker position={{lat: targetPos.x, lng: targetPos.z}} />
+            <Marker  zIndexOffset={1000} icon={rocketIcon} position={{lat: targetPos.current.x, lng: targetPos.current.z}} >
+              {/*<Tooltip direction="bottom"  opacity={0.1} permanent>Rocket</Tooltip>*/}
+            </Marker>
+          
+            { //don't let apogee point show if current point is the apogee
+              targetPos.apogeePoint.x != targetPos.current.x ?             
+            
+              <Marker icon={apogeeIcon} position={{lat: targetPos.apogeePoint.x, lng: targetPos.apogeePoint.z}} >
+                {showLabel === true ? <Tooltip className="tooltip" direction="top" offset={[0, 0]} opacity={1} permanent>Apogee Point</Tooltip> : []}
+              </Marker>
+
+              :
+
+              []
+
+            }
+
+            {showPath === true ? <Polyline positions={rocketPath}> </Polyline> : [] }
+
+                      
+            <Marker icon={launchIcon} position={{lat: targetPos.launchPoint.x, lng: targetPos.launchPoint.z}} >
+              {showLabel === true ? <Tooltip className="tooltip" direction="bottom" offset={[0, 0]} opacity={1} permanent>Launchpad</Tooltip> : []}
+            </Marker>
+
         </MapContainer>
         
     );
