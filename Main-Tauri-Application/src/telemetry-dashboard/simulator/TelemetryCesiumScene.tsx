@@ -28,7 +28,7 @@ type TelemetryCesiumSceneProps = {
 //const MODEL_URL = "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb";
 
 // @ts-expect-error
-import MODEL_URL from "../../../assets/Models/argus.glb";
+import MODEL_URL from "../../../assets/Models/Argus.glb";
 
 
 import { ScenegraphLayer } from "@deck.gl/mesh-layers"; 
