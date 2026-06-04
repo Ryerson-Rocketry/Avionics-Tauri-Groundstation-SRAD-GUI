@@ -429,7 +429,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
           mainVolt: raw.mainVolt ?? 0,
           drogueVolt: raw.drogueVolt ?? 0,
 
-          orientation: {pitch: clamp(raw.orientation.pitch, -90, 90), roll: clamp(raw.orientation.roll, 0, 360), yaw: clamp(raw.orientation.yaw, 0, 360) } || { pitch: 0, roll: 0, yaw: 0 },
+          orientation: {pitch: raw.orientation.pitch, roll: raw.orientation.roll, yaw: raw.orientation.yaw } || { pitch: 0, roll: 0, yaw: 0 },
           
           
         };

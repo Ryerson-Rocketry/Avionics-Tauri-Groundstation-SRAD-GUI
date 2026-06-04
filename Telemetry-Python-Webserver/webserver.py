@@ -6,6 +6,7 @@ from websockets.exceptions import ConnectionClosedOK
 from websockets.exceptions import ConnectionClosedError
 from websockets.exceptions import ConnectionClosed
 from websockets.exceptions import ConcurrencyError
+import numpy as np
 import random
 
 from os import path 
@@ -15,6 +16,8 @@ import csv
 import sys
 
 from radio_handler import radio_handler as radio_handle
+
+from utility import get_pitch_yaw
 
 async def kill_command():
     await asyncio.get_event_loop().run_in_executor(None, lambda: input("Enter something: "))
@@ -99,6 +102,7 @@ async def rocketry_data_test_handler(websocket):
             print ("ERR", flush = True)
             break
 
+"""
 #Simulates test data based on rocketry data, will run until all csv rows are transmitted
 async def rocketry_data_file_test_handler(websocket):
     print ("RUNNING", flush = True)
@@ -111,11 +115,34 @@ async def rocketry_data_file_test_handler(websocket):
 
     total_sleep_time = 0
     sleep_offset = 0
+
+
+    launch_coord = None
+    prev_coord = None
+    roll = 0
+
+
+        
     while len(dat) > 2:
+        pitch = 0
+        yaw = 0
+
         try:
             row = dat.pop(0)
 
             if (row['longitude'] != "-77.1476655"): #crackhead data keeps jumping to end point for some reason
+                #if (launch_coord != None):
+                #    pitch, yaw = get_pitch_yaw(launch_coord, [float(row['latitude']), float(row['altitude']), float(row['longitude'])])
+                if (prev_coord != None):
+                    temp_pitch, temp_yaw = get_pitch_yaw(prev_coord, [float(row['latitude']), float(row['longitude']), float(row['altitude']) ])
+                    
+                    if (prev_coord[2] != float(row['altitude'])):
+                        pitch = temp_pitch
+
+                    #if (prev_coord[0] != float(row['latitude']) or prev_coord[1] != float(row['longitude'] )):
+                    yaw = temp_yaw
+                    
+
                 data = {
                     "alt": float(row['altitude']),
                     "velocity": float(row['speed']),
@@ -131,9 +158,9 @@ async def rocketry_data_file_test_handler(websocket):
                     'z': -0.707,
                     'w': 0},
 
-                    "orientation": {'pitch': 30,
-                    'roll': 20,
-                    'yaw': 20,
+                    "orientation": {'pitch': pitch,
+                    'roll': roll,
+                    'yaw': yaw,
                     },
 
                     "battVolt": float(row['battery_voltage']),
@@ -143,6 +170,16 @@ async def rocketry_data_file_test_handler(websocket):
                 }
                 #print("sending (Sleeptime): " + str(total_sleep_time) )
 
+                if (launch_coord == None):
+                    launch_coord = [float(row['latitude']), float(row['longitude']), float(row['altitude'])]
+                prev_coord = [float(row['latitude']), float(row['longitude']), float(row['altitude'])]
+            
+            if (roll > 360):
+                roll = 0
+            else:
+                roll += 1
+
+                    
 
             #default sleep time
             sleeptime = 0.1
@@ -171,7 +208,127 @@ async def rocketry_data_file_test_handler(websocket):
             break
 
     print ("END OF TRANMISSION", flush = True)
+"""
 
+#Simulates test data based on rocketry data, will run until all csv rows are transmitted (FAKES LONGITUDE AND LATITUDE CAUSE TEST DATA IS SHIT)
+async def rocketry_data_file_test_handler(websocket):
+    print ("RUNNING", flush = True)
+    
+    with open(path_to_dat, 'r', newline='') as csvfile:
+        dat = []
+        reader = csv.DictReader(csvfile, skipinitialspace=True ,delimiter=',', quotechar='|')
+        for row in reader:
+            dat.append(row);
+
+    total_sleep_time = 0
+    sleep_offset = 0
+
+
+    launch_coord = None
+    prev_coord = None
+    roll = 0
+
+
+    
+    #FAKED STUFF
+    time_step = 0
+    time_step_threshold = 5
+    longitude = -77.1476655
+    latitude = 42.6954034
+
+    alt_time_step = 0
+    alt = (np.sin(alt_time_step)*150 + 300)
+
+    delta_long = -(random.randint(1, 10))/10000
+    delta_lat = (random.randint(1, 10))/10000
+
+    while len(dat) > 2:
+        pitch = 0
+        yaw = 0
+
+        try:
+            row = dat.pop(0)
+
+            if (prev_coord != None):
+                temp_pitch, temp_yaw = get_pitch_yaw( [latitude, longitude, alt ], prev_coord)
+                print (temp_pitch)
+
+                yaw = -temp_yaw + 86 # + 86 cause its for some reason tangent to line, -temp_yaw cause yess
+                pitch = temp_pitch
+                
+
+
+            data = {
+                "alt": alt,
+                "velocity": float(row['speed']),
+                "timestamp": float(row['time']),
+                "acceleration": float(row['acceleration']),
+                "pressure": float(row['pressure']),
+                "state": (row['state_name']).strip(),
+                "position": {'x': latitude,
+                            'y': alt,
+                            'z': longitude},
+                "quaternion": {'x': 0,
+                'y': 0.707,
+                'z': -0.707,
+                'w': 0},
+
+                "orientation": {'pitch': pitch,
+                'roll': roll,
+                'yaw': yaw,
+                },
+
+                "battVolt": float(row['battery_voltage']),
+                "drogVolt": float(row['drogue_voltage']),
+                "temp": float(row['temperature']),
+                "mainVolt": float(row['main_voltage']),
+            }
+            #print("sending (Sleeptime): " + str(total_sleep_time) )
+
+
+
+            if (launch_coord == None):
+                launch_coord = [latitude, longitude, alt]
+            prev_coord = [latitude, longitude, alt]
+
+
+            longitude += delta_long
+            latitude += delta_lat
+
+            
+            alt_time_step += 0.05
+            alt = round((np.sin(alt_time_step)*150 + 300))
+            #print (alt)
+
+            time_step += 1
+            if (time_step == time_step_threshold):
+                time_step = 0
+                delta_long = -(random.randint(1, 10))/10000
+                delta_lat = (random.randint(1, 10))/10000
+            
+            if (roll > 360):
+                roll = 0
+            else:
+                roll += 1
+
+
+                    
+
+            #default sleep time
+            total_sleep_time += 1
+            data['timestamp'] = str(total_sleep_time)
+
+            #print(data)
+            await websocket.send(json.dumps(data))
+
+            await asyncio.sleep(0.5)
+        except ConnectionClosedOK:
+            print("CONNECTION (DASHBOARD) CLOSED", flush = True)
+            break
+
+    print ("END OF TRANMISSION", flush = True)
+
+    
 #test run of test data csv to console 
 async def rocketry_data_csv_test_console():
     with open('test_data/test-flight-2026-March.csv', 'r', newline='') as csvfile:

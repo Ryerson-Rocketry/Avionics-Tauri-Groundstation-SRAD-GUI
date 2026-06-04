@@ -1,18 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Sky } from "@react-three/drei";
-
-
-import { Rocket } from "../objects/Rocket.jsx";
-import { LaunchPlatform } from "../landscape/LaunchPlatform.jsx";
-import { Trajectory } from "../landscape/Trajectory.jsx";
-import { GpsScene } from "./GpsScene.jsx";
 
 import Map, { Layer, MapRef, Marker, Popup } from 'react-map-gl/maplibre';
 // @ts-expect-error
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-import styleJson from '../../../assets/maplibre/stylespec.json';
 
 // @ts-expect-error
 import rocketMarker from "../../../assets/map/rocket_marker.png";
@@ -37,23 +27,35 @@ type TelemetryCesiumSceneProps = {
 
 //const MODEL_URL = "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb";
 
+// @ts-expect-error
+import MODEL_URL from "../../../assets/Models/argus.glb";
+
 
 import { ScenegraphLayer } from "@deck.gl/mesh-layers"; 
-import DeckGL from "@deck.gl/react";
-
-
 import {useControl} from 'react-map-gl/maplibre';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import {DeckProps} from '@deck.gl/core';
+
+import {LineLayer, PathLayer} from 'deck.gl';
+
+
 function DeckGLOverlay(props: DeckProps) {
   const overlay = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
   overlay.setProps(props);
   return null;
 }
 
+
+type FlightPath = {
+  start: [longitude: number, latitude: number, altitude: number];
+  end: [longitude: number, latitude: number, altitude: number];
+};
+
 //aint actually cesium (maplibre instead) but too lazy to change name
 export default function TelemetryCesiumScene({ telemetry, history, rocketPos, isTrackOn, zoomDistance, satView, groundLevelOffset = 2, showPath, showLabel } : TelemetryCesiumSceneProps ) {
   const mapRef = useRef<MapRef>(null);
+  const [rocketPath, setRocketPath] = useState ([]);
+  const [rocketFlightPath, setRocketFlightPath] = useState([]);
 
   const rocketModel = [{
     lat: rocketPos.current.x,   
@@ -66,19 +68,31 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
   const layer = new ScenegraphLayer({
     id: "airplane-layer",
     data: rocketModel,
-    scenegraph: "../../../assets/Models/argus.glb",
-    sizeScale: 0.010,
+    scenegraph: MODEL_URL,
+    sizeScale: 0.050,
     pickable: true,
     getPosition: (d) => d.position,
     getOrientation: (d) => {
-      const pitch = 0;
-      const yaw = -d.heading;
-      return [pitch, yaw, 0];
+      const pitch = telemetry.orientation.pitch;
+      const yaw = telemetry.orientation.yaw;
+      // [pitch, yaw, roll]
+      return [telemetry.orientation.pitch ,  telemetry.orientation.yaw, 0];
     },
     getScale: [1, 1, 1],
   });
 
-
+  const line3dLayer = new LineLayer<FlightPath>({
+      id: 'flight-paths',
+      data: rocketFlightPath,
+      opacity: 0.8,
+      getSourcePosition: d => d.start,
+      getTargetPosition: d => d.end,
+      getColor: d => {
+        return [100,100,100];
+      },
+      getWidth: 5,
+      pickable: true
+    })
   
   useEffect(() => {
     console.log("Rocket Position Changed: " + rocketPos);
@@ -86,25 +100,49 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
       mapRef.current?.setZoom(zoomDistance);
       mapRef.current?.setCenter([rocketPos.current.z, rocketPos.current.x]);
       mapRef.current?.setCenterElevation(rocketPos.current.y + groundLevelOffset);
+
+      /*
+      let lineGeo = mapRef.current?.queryRenderedFeatures();
+
+      if (lineGeo != undefined){
+        for (var i = 0; i < lineGeo?.length; i++){
+          
+          if (lineGeo[i].geometry.type.toString() == "LineString"){
+            //console.log(lineGeo[i].geometry.type);
+  
+
+          }
+          
+        }
+      }
+      */
       
     }
   }, [mapRef, rocketPos, zoomDistance, groundLevelOffset]);
 
   
 
-  const [rocketPath, setRocketPath] = useState ([]);
+
   
   useEffect(() => {
       //console.log("PATH" + rocketPath.length);
       //var mapped = targetPos.map(item => ({ ["x"]: item.value }) );
       
       var temp = [];
+      var flightTemp = [] as FlightPath[];
       for (var i = 0; i < rocketPos.all.length; i++){
-        temp.push([rocketPos.all[i].z, rocketPos.all[i].x]);
+        temp.push([rocketPos.all[i].z, rocketPos.all[i].x, rocketPos.current.y]);
+
+        if (i < rocketPos.all.length - 1 && i > 0){ //cannot create a path from the very first line vertice or the last
+          flightTemp.push({
+            start: [rocketPos.all[i-1].z, rocketPos.all[i-1].x, rocketPos.all[i-1].y + groundLevelOffset],
+            end: [rocketPos.all[i].z, rocketPos.all[i].x, rocketPos.all[i].y + groundLevelOffset]})
+        }
       }
       // @ts-expect-error
       setRocketPath(temp);
-      
+      // @ts-expect-error
+      setRocketFlightPath(flightTemp);
     }
   ,[rocketPos]);
 
@@ -314,7 +352,7 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
             ],
             "terrain": {
                 "source": "terrainSource",
-                "exaggeration": 2
+                "exaggeration": 1
             },
             
           "sky": {}
@@ -337,7 +375,7 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
         </Marker>
 
         {/* @ts-expect-error */}
-        <DeckGLOverlay layers={[layer]} interleaved/>
+        <DeckGLOverlay layers={[layer, line3dLayer]} interleaved/>
       </Map>
 
 

@@ -2,3 +2,4 @@ pyserial
 websockets
 pyinstaller
 pyserial-asyncio
+numpy

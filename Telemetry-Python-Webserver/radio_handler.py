@@ -12,7 +12,7 @@ from websockets.exceptions import ConnectionClosedOK
 
 import serial.tools.list_ports #https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python 
 
-#TODO: Check if
+#TODO: MUST CHECK IF WEBSOCKET HAS DISCONNECTED DURING THIS LOOP, ELSE SHIT IS STUCK
 async def serial_connect():
     while(True):
         try:
