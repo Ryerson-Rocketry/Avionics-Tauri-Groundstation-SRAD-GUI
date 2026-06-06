@@ -18,7 +18,7 @@ import { ChartGroupPanel } from "./components/ChartGroupPanel.jsx";
 
 import "./dashboard.css";
 import { GaugeGroupPanel } from "./components/GaugeGroupPanel.jsx";
-import { RadioStatusPanel } from "./components/radioStatusPanel.jsx";
+import { RadioStatusPanel } from "./components/RadioStatusPanel.jsx";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
