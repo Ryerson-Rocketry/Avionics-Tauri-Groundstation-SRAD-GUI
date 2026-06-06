@@ -163,14 +163,22 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
     pos: { x: 0, y: 0, z: 0 }, //x = lat, z = long , y = alt
     quat: { x: 0, y: 0, z: 0, w: 1 }, //UNUSED, IGNORE
 
+    acceleration: 0,
+    accelAxis: { x: 0, y: 0, z: 0 }, //NEW 06-06
+
+    radioInfo: {snr: 0, rssi: 0, callsign: "N/A", freqErr: 0}, //NEW 06-06
+
+    statusBits: 0, //NEW 06-06
+
 
     pressure: 0,
     stateName: "null",
-    acceleration: 0,
+    
     temp: 0,
     battVolt: 0,
-    mainVolt: 0,
-    drogueVolt: 0,
+
+    mainVolt: 0, //UNUSED
+    drogueVolt: 0, //UNUSED
 
     //rocket orientation shit
     orientation: {
@@ -431,7 +439,9 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
 
           orientation: {pitch: raw.orientation.pitch, roll: raw.orientation.roll, yaw: raw.orientation.yaw } || { pitch: 0, roll: 0, yaw: 0 },
           
-          
+          accelAxis: {x: raw.acceleration_axis.x,  y: raw.acceleration_axis.y, z: raw.acceleration_axis.z},
+          radioInfo: {rssi: raw.radio_info.rssi, snr: raw.radio_info.snr, callsign: raw.radio_info.callsign, freqErr: raw.radio_info.freqError},
+          statusBits: raw.statusBits
         };
 
         setTelemetry(processed);

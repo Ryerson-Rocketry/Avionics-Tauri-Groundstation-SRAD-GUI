@@ -18,6 +18,7 @@ import { ChartGroupPanel } from "./components/ChartGroupPanel.jsx";
 
 import "./dashboard.css";
 import { GaugeGroupPanel } from "./components/GaugeGroupPanel.jsx";
+import { RadioStatusPanel } from "./components/radioStatusPanel.jsx";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -176,14 +177,16 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
       />
 
       <main className="dashboardGrid" >
-        <div className={telemetryState === true ? "dashboardLeftNormal" : "dashboardLeftExpanded"}>
+        <div className={telemetryState === true ? "dashboardLeftNormal" : "dashboardLeftExpanded"} >
           <SimViewPanel
           telemetry={telemetry}
           history={history}
           rocketPos={rocketPos}
           isLocked={isLocked}
           />
-          {telemetryState === false ? <GaugeGroupPanel className = "dashboardGauge" stats={stats}/> : [] }
+          
+            {telemetryState === false ? /*<GaugeGroupPanel className = "dashboardGauge" stats={stats}/>*/ <div style={{height: "18vh"}}> <RadioStatusPanel telemetry={telemetry} ></RadioStatusPanel> </div> : [] }
+          
         </div>
  
 

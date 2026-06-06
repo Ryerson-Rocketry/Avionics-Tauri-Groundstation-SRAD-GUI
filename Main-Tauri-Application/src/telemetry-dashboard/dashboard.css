@@ -1,5 +1,5 @@
 .dashboardRightExpanded {
-    height: 85vh; 
+    height: 90vh; 
     grid-column: 2;
     grid-row: 1;
     display: flex;
@@ -38,7 +38,7 @@
 }
 
 .dashboardLeftExpanded {
-    height: 85vh; 
+    height: 90vh; 
     grid-column: 1;
     grid-row: 1;
     display: flex;

@@ -928,7 +928,9 @@ export const uiStyles = {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      padding: '1.2vh 1.2vw',
+
+      //borderStyle: 'dotted',
+
       boxSizing: 'border-box',
       overflow: 'hidden',
       fontFamily: ui.font.orbitron,
@@ -941,7 +943,7 @@ export const uiStyles = {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      padding: '1.2vh 1.2vw',
+  
       paddingBottom: '10vh', // leave room for fixed replay controls
       boxSizing: 'border-box',
       overflow: 'hidden',

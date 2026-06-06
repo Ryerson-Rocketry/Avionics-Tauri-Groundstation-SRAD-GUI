@@ -20,6 +20,7 @@ import rocketMarker from "../../../assets/map/rocket_marker.png";
 import apogeeMarker from "../../../assets/map/apogee_marker.png";
 import launchMarker from "../../../assets/map/launch_marker.png";
 import Typography from "@mui/material/Typography";
+import NavBallScene from "../simulator/NavBallScene.jsx";
 
 export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
   const { tokens: ui, styles: uiStyles } = useTheme();
@@ -221,7 +222,10 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
                 <GpsScene satView={satView} targetPos = {rocketPos} zoom = {gpsZoomLevel} showLabel={showLabel} showPath={showPath}></GpsScene>  
       
             </div>
-
+            
+            <div style={{ width: "25%", height: "25%", padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", right: 0, left: 0, bottom: 0, marginLeft: "auto",marginRight: "auto", zIndex:1000 }}>
+              <NavBallScene orientation={telemetry.orientation}/>
+            </div>
 
           </div>
           

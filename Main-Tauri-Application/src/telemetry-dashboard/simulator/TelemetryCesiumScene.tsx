@@ -73,10 +73,10 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
     pickable: true,
     getPosition: (d) => d.position,
     getOrientation: (d) => {
-      const pitch = telemetry.orientation.pitch;
+      const pitch = (telemetry.orientation.pitch) ;
       const yaw = telemetry.orientation.yaw;
       // [pitch, yaw, roll]
-      return [telemetry.orientation.pitch ,  telemetry.orientation.yaw, 0];
+      return [-telemetry.orientation.pitch + 90,  telemetry.orientation.yaw, 0];
     },
     getScale: [1, 1, 1],
   });

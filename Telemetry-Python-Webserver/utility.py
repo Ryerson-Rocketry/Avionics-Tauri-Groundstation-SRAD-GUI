@@ -9,7 +9,7 @@ def get_pitch_yaw(start_point, end_point):
     norm_vec = direction_vec/np.linalg.vector_norm(direction_vec) #https://stackoverflow.com/questions/9171158/how-do-you-get-the-magnitude-of-a-vector-in-numpy
     
     pitch_angle = pitch(norm_vec)
-    print ("CALCULATED PITCH AS: " + str(pitch_angle) + " USING: " + str(start_vec[2]) + " " + str(end_vec[2])  +  " " + str(norm_vec))
+    #print ("CALCULATED PITCH AS: " + str(pitch_angle) + " USING: " + str(start_vec[2]) + " " + str(end_vec[2])  +  " " + str(norm_vec))
     yaw_angle = yaw(norm_vec)
 
     return pitch_angle, yaw_angle
