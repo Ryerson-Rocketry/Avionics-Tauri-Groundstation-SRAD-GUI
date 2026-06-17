@@ -11,15 +11,37 @@ import { invoke } from '@tauri-apps/api/core';
 const CONNECT_TIMEOUT_MS = 8000;
 const SAVE_CREATE_TIMEOUT_MS = 6000;
 
-function withTimeout(promise, timeoutMs, timeoutMessage) {
-  let t;
+//the specific data mission instance
+type MissionInstanceSettings = {
+  telemetry: any,
+  history: any,
+  rocketPos: any,
+  isTrackOn : any,
+  zoomDistance: any,
+  satView: boolean,
+  groundLevelOffset: number,
+  
+  showPath: boolean,
+  showLabel: boolean
+};
+
+
+
+
+
+async function WithTimeout(promise: Promise<any>, timeoutMs: number, timeoutMessage: string) {
+  let t: any;
   const timeout = new Promise((_, reject) => {
     t = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
   });
   return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
 }
 
-const NewMissionRoot = ({ onMissionLinkReady }) => {
+type MissionRootProps = {
+  onMissionLinkReady({}): any;
+}
+
+const NewMissionRoot = ({ onMissionLinkReady }: MissionRootProps) => {
   const { tokens: ui, styles: uiStyles } = useTheme();
   const [missionName, setMissionName] = useState('');
   const [craftName, setCraftName] = useState('');
@@ -31,18 +53,21 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
   const [telemetryIp, setTelemetryIp] = useState('127.0.0.1');
   const [telemetryPort, setTelemetryPort] = useState('8765');
 
-  const [schemas, setSchemas] = useState([]);
+  //set as any type temp for now
+  const [schemas, setSchemas] = useState<any>([]);
+
   const [isLoadingSchemas, setIsLoadingSchemas] = useState(true);
   const [schemaPreviewOpen, setSchemaPreviewOpen] = useState(false);
 
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionError, setConnectionError] = useState(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const [useDemoMode, setUseDemoMode] = useState(false);
   const [useImmediateStartMode, setUseImmediateStartMode] = useState(true);
 
-  const wsRef = useRef(null);
-  const connectTimeoutRef = useRef(null);
+  const wsRef = useRef<WebSocket>(null);
+  //any temp for now
+  const connectTimeoutRef = useRef<any>(null);
 
   const canConnect =
     //dont allow start unless these are filled in
@@ -67,7 +92,7 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
     fetchSchemas();
   }, []);
 
-  const selectedSchema = schemas.find((s) => String(s.id) === String(schemaId)) || null;
+  const selectedSchema = schemas.find((s: any) => String(s.id) === String(schemaId)) || null;
 
   const cleanupConnectAttempt = () => {
     if (connectTimeoutRef.current) {
@@ -129,7 +154,7 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
       let saveDirName = null;
       if (saveData && selectedSchema) {
         try {
-          saveDirName = await withTimeout(
+          saveDirName = await WithTimeout(
             invoke('create_mission_save', {
               missionName: missionName.trim(),
               schema: selectedSchema,
@@ -137,7 +162,7 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
             SAVE_CREATE_TIMEOUT_MS,
             'Save creation timed out. Try again.'
           );
-        } catch (err) {
+        } catch (err: any) {
           const msg = typeof err === 'string' ? err : err?.message || String(err);
           setConnectionError(msg);
           return;
@@ -233,7 +258,7 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
                   disabled={isLoadingSchemas || schemas.length === 0}
                 >
                   <option value="">Select a saved schema</option>
-                  {schemas.map((schema) => {
+                  {schemas.map((schema: any) => {
                     const title = schema.mission_metadata?.name || schema.id || "—";
                     const vessel = schema.mission_metadata?.vessel_id || '';
                     const label = vessel ? `${title} | ${vessel}` : title;
@@ -345,7 +370,9 @@ const NewMissionRoot = ({ onMissionLinkReady }) => {
             >
               {isConnecting ? 'CONNECTING…' : 'CONNECT & OPEN DASHBOARD'}
             </Button>
-            {isConnecting && (
+            {isConnecting && 
+               
+              (
               <Button
                 size="md"
                 variant="outline"

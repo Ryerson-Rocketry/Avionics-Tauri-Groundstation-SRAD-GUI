@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
 import { useTheme } from '../styles/ThemeContext.jsx';
 
+type ButtonProps = {
+  children?: any,
+  onClick?: any,
+  type?: any,
+  disabled?: any,
+  size?: any,
+  variant?: any, // 'outline' | 'gradient' | 'solid' | 'ghost'
+  outlineColor?: any,
+  textColor?: any,
+  backgroundColor?: any,
+  hoverBackgroundColor?: any,
+  borderStyle?: any,
+  glow?: any,
+  fullWidth?: any,
+  icon?: any,
+  style?: any
+}
+
 const Button = ({
   children,
   onClick,
@@ -18,7 +36,7 @@ const Button = ({
   icon,
   style = {},
   ...rest
-}) => {
+}: ButtonProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const { styles: uiStyles } = useTheme();

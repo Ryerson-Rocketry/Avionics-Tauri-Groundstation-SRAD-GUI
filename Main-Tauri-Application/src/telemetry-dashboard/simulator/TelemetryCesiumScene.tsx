@@ -22,7 +22,9 @@ type TelemetryCesiumSceneProps = {
   groundLevelOffset: number,
   
   showPath: boolean,
-  showLabel: boolean
+  showLabel: boolean,
+
+  localHosting: boolean
 };
 
 //const MODEL_URL = "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb";
@@ -38,6 +40,7 @@ import {DeckProps} from '@deck.gl/core';
 
 import {LineLayer, PathLayer} from 'deck.gl';
 
+const LOCAL_URL = "http://localhost:3000/MAIN/{z}/{x}/{y}";
 
 function DeckGLOverlay(props: DeckProps) {
   const overlay = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
@@ -52,7 +55,7 @@ type FlightPath = {
 };
 
 //aint actually cesium (maplibre instead) but too lazy to change name
-export default function TelemetryCesiumScene({ telemetry, history, rocketPos, isTrackOn, zoomDistance, satView, groundLevelOffset = 2, showPath, showLabel } : TelemetryCesiumSceneProps ) {
+export default function TelemetryCesiumScene({ telemetry, history, rocketPos, isTrackOn, zoomDistance, satView, groundLevelOffset = 2, showPath, showLabel, localHosting } : TelemetryCesiumSceneProps ) {
   const mapRef = useRef<MapRef>(null);
   const [rocketPath, setRocketPath] = useState ([]);
   const [rocketFlightPath, setRocketFlightPath] = useState([]);
@@ -62,7 +65,8 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
     lng: rocketPos.current.z,
     altitude: rocketPos.current.y,
     heading: 4,
-    position: [rocketPos.current.z, rocketPos.current.x, rocketPos.current.y+groundLevelOffset-10]
+    position: [rocketPos.current.z, rocketPos.current.x, rocketPos.current.y+groundLevelOffset-10],
+    color: [0,0,255]
   }];
   
   const layer = new ScenegraphLayer({
@@ -72,6 +76,7 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
     sizeScale: 0.050,
     pickable: true,
     getPosition: (d) => d.position,
+    getColor: d => d.color,
     getOrientation: (d) => {
       const pitch = (telemetry.orientation.pitch) ;
       const yaw = telemetry.orientation.yaw;
@@ -144,7 +149,7 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
       // @ts-expect-error
       setRocketFlightPath(flightTemp);
     }
-  ,[rocketPos]);
+  ,[rocketPos, groundLevelOffset]);
 
   {/*
   return (
@@ -286,7 +291,7 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
         }}
         
         centerClampedToGround={false}
-        maxPitch={180}
+        //maxPitch={180}
       
 
         mapStyle= {{   
@@ -294,12 +299,11 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
             "sources": {
                 "osm": {
                     "type": "raster",
-                    "tiles": [satView === false ? "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png" : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
+                    "tiles": [localHosting === true ? LOCAL_URL : satView === false ? "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png" : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
                     "tileSize": 256,
                     "attribution": "&copy; OpenStreetMap Contributors",
                     "maxzoom": 20
                 },
-                
                 "terrainSource": {
                     "type": "raster-dem",
                     "url": "https://tiles.mapterhorn.com/tilejson.json"
@@ -328,6 +332,8 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
                     "type": "raster",
                     "source": "osm"
                 },
+
+                /*
                 {
                     "id": "hills",
                     "type": "hillshade",
@@ -335,6 +341,7 @@ export default function TelemetryCesiumScene({ telemetry, history, rocketPos, is
                     "layout": {"visibility": "visible"},
                     "paint": {"hillshade-shadow-color": "#1a170f"}
                 },
+                */
                 
                 {
                   'id': 'route',

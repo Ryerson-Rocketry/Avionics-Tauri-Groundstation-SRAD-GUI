@@ -165,7 +165,9 @@ async def rocketry_data_file_test_handler(websocket):
     roll = 0
 
 
-    
+    missed_packets = 0 
+    total_packets = 0
+
     #FAKED STUFF
     time_step = 0
     time_step_threshold = 5
@@ -185,6 +187,7 @@ async def rocketry_data_file_test_handler(websocket):
     delta_lat = (random.randint(1, 10))/100000
 
     while len(dat) > 2:
+        total_packets += 1
         #pitch = 0
         yaw = 0
 
@@ -271,11 +274,13 @@ async def rocketry_data_file_test_handler(websocket):
                     "rssi": 10,
                     "snr": 15,
                     "freqError": 17,
-                    "callsign": "CRACKHEAD555",
+                    "callsign": "TEST123CALL",
+                    "totalPackets": total_packets,
+                    "missedPackets": missed_packets
                 },
 
                 #32 Bit Status Check
-                "statusBits": int(3242343214),
+                "statusBits": int(4294967295),
 
                 #NOT USED
                 "drogVolt": float(-1),

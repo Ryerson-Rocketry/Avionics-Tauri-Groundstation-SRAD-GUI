@@ -62,8 +62,9 @@ const ESRI_ATTRIB = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS
 const OSM_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const OSM_ATTRIB = '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
+const LOCAL_URL = "http://localhost:3000/MAIN/{z}/{x}/{y}";
 
-export function GpsScene({targetPos, zoom, satView, showLabel, showPath}) {
+export function GpsScene({targetPos, zoom, satView, showLabel, showPath, localHosting}) {
     const [map, setMap] = useState(undefined); 
     const [rocketPath, setRocketPath] = useState ([]);
 
@@ -93,7 +94,7 @@ export function GpsScene({targetPos, zoom, satView, showLabel, showPath}) {
         >
         <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url={satView === true ? ESRI_URL : OSM_URL}
+            url={localHosting === true ? LOCAL_URL : satView === true ? ESRI_URL : OSM_URL}
         />
             
             <MapRecenter coords={{lat: targetPos.current.x, lng: targetPos.current.z}} />

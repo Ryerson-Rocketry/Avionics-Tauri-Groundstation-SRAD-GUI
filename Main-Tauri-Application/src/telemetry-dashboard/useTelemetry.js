@@ -166,8 +166,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
     acceleration: 0,
     accelAxis: { x: 0, y: 0, z: 0 }, //NEW 06-06
 
-    radioInfo: {snr: 0, rssi: 0, callsign: "N/A", freqErr: 0}, //NEW 06-06
-
+    radioInfo: {snr: 0, rssi: 0, callsign: "N/A", freqErr: 0, totalPackets: 0, missedPackets: 0}, //NEW 06-06
     statusBits: 0, //NEW 06-06
 
 
@@ -440,7 +439,14 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
           orientation: {pitch: raw.orientation.pitch, roll: raw.orientation.roll, yaw: raw.orientation.yaw } || { pitch: 0, roll: 0, yaw: 0 },
           
           accelAxis: {x: raw.acceleration_axis.x,  y: raw.acceleration_axis.y, z: raw.acceleration_axis.z},
-          radioInfo: {rssi: raw.radio_info.rssi, snr: raw.radio_info.snr, callsign: raw.radio_info.callsign, freqErr: raw.radio_info.freqError},
+          radioInfo: {
+            rssi: raw.radio_info.rssi, 
+            snr: raw.radio_info.snr, 
+            callsign: raw.radio_info.callsign, 
+            freqErr: raw.radio_info.freqError, 
+            totalPackets:  raw.radio_info.totalPackets,
+            missedPackets: raw.radio_info.missedPackets  
+          },
           statusBits: raw.statusBits
         };
 

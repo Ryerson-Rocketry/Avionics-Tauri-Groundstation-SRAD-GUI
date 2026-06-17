@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from "@tauri-apps/api/core";
 import Card from '../../components/Card.jsx';
-import Button from '../../components/Button.jsx';
+import Button from '../../components/Button';
 import { useTheme } from "../../styles/ThemeContext.jsx";
 
 const SettingsRoot = ({ setActiveMenu }) => {

@@ -35,6 +35,7 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
 
   const[mapState, setMapState] = useState(false); //false 3d map/true 2d map
   const[satView, setSatView] = useState(true);
+  const[localHosting, setLocalHosting] = useState(false);
 
 
   //component control states
@@ -112,9 +113,9 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
                 {reconstructionZoomLevel}
               </span>
             </div>
-          <Button size="sm" variant="outline" outlineColor={ui.colors.red} textColor={ui.colors.red} onClick={onOffset}
+          <Button size="sm" variant="outline" outlineColor={localHosting === false ? ui.colors.red: ui.colors.green} textColor={localHosting === false ? ui.colors.red: ui.colors.green} onClick={() => setLocalHosting(!localHosting)}
           >
-            Calibrate
+            Local Data
           </Button>
 
           <Button size="sm" variant="outline" outlineColor={ui.colors.cyan} textColor={ui.colors.cyan} onClick={() => setSatView(!satView)}>
@@ -214,12 +215,14 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
               bgColor="rgba(5,5,8,0.95)"
               zoomDistance={reconstructionZoomLevel}
 
+              localHosting={localHosting}
+
               showPath={showPath}
               showLabel={showLabel}
             />
             <div style={{ ...dash.glassPane, width: "25%", height: "25%", position: "absolute", bottom: 10, right: 10, zIndex:100, borderStyle: 'solid', borderWidth: '10px' }}> 
 
-                <GpsScene satView={satView} targetPos = {rocketPos} zoom = {gpsZoomLevel} showLabel={showLabel} showPath={showPath}></GpsScene>  
+                <GpsScene localHosting={localHosting} satView={satView} targetPos = {rocketPos} zoom = {gpsZoomLevel} showLabel={showLabel} showPath={showPath}></GpsScene>  
       
             </div>
             
@@ -230,7 +233,7 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
           </div>
           
           :
-          <GpsScene satView={satView} targetPos={rocketPos} zoom={gpsZoomLevel} showLabel={showLabel} showPath={showPath}/>
+          <GpsScene localHosting={localHosting} satView={satView} targetPos={rocketPos} zoom={gpsZoomLevel} showLabel={showLabel} showPath={showPath}/>
           }
           
         </div>

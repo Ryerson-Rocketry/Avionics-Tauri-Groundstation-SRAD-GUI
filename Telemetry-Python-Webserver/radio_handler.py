@@ -146,6 +146,9 @@ async def radio_handler(websocket):
 
     reader, writer = await serial_connect()
 
+    missed_packets = 0
+    total_packets = 0
+
     while True:   
 
         packet = []
@@ -158,21 +161,30 @@ async def radio_handler(websocket):
                 str_line = str(line, 'utf-8')
                 str_line = str_line.replace("\n", "")
                 str_line = str_line.replace("\r", "")
-                #print (str_line)
+                print (str_line)
 
                 #len(packet) == 0 to check if this is the very first ---- 
+                
+                    
+                
                 if "------------------------------------------------" in str_line and not (len(packet) == 0):
                     if (len(packet) == 14): #ONLY ACCEPT IF THE       
                         full_packet_recieved = True
                     else:
-                        print ("INFO: IRREGULAR PACKET LENGTH FOUND (NOT 14 LINES), NOT ACCEPTING, DELETING PACKET AND TRYING AGAINT", flush = True)
+                        print ("INFO: IRREGULAR PACKET LENGTH FOUND (NOT 14 LINES); REJECTING PACKET; DELETING PACKET, WILL TRY AGAIN", flush = True)
                         packet = []
 
                 #ignore if it is the very first shit
                 elif "------------------------------------------------" in str_line and (len(packet) == 0):
                     pass
                 else:
-                    packet.append(str_line)
+                    if "Missed packets:" not in str_line:
+                        packet.append(str_line)
+                        total_packets += 1
+                    else:
+                        missed_packets += 1
+                        total_packets += 1
+                        
                     #print(len(packet))
                     pass
 
@@ -191,11 +203,11 @@ async def radio_handler(websocket):
                         print ("SUCCESS: successful reconnect, returning to main loop", flush = True)
 
                     case _:
-                        print("ERR: unknown error, fuck if i know: " + str(e), flush = True)
+                        print("ERR: unknown error, " + str(e), flush = True)
                         await asyncio.sleep(1)
         
         try:
-            #print ("FULL PACKET RECIEVED: NOW PARSING packet length of: " + str(len(packet)))
+            #print ("FULL PACKET RECIEVED: NOW PARSING packet length of: " + str(len(packet)), flush = True)
             
 
             # REPLACE LATER WITH FOR LOOPS BRAH, ACTUALLY RETARDED
@@ -304,6 +316,8 @@ async def radio_handler(websocket):
                     "snr": float(snr),
                     "freqError": float(freq_err),
                     "callsign": callsign,
+                    "totalPackets": total_packets,
+                    "missedPackets": missed_packets
                 },
      
 
