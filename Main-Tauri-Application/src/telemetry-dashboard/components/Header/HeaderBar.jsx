@@ -147,6 +147,9 @@ export function HeaderBar({
         <Button disabled size="sm" variant="outline" outlineColor={ui.colors.cyan} textColor={ui.colors.cyan} >
           Manage View Panel
         </Button>
+        
+        {/*
+        
         <button
           onClick={onToggleLock}
           style={{
@@ -161,6 +164,7 @@ export function HeaderBar({
         >
           {isLocked ? labels.telemetry.lockLocked : labels.telemetry.lockFree}
         </button>
+        */}
         <Button size="sm" variant="outline" outlineColor={ui.colors.red} textColor={ui.colors.red} onClick={onExit}>
           {labels.telemetry.exit}
         </Button>

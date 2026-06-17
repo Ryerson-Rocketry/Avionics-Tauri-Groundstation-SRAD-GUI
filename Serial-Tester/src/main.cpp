@@ -24,7 +24,7 @@ USBKeyboard Keyboard;
 
 uint32_t lastPacketNumber = 0;
 
-uint32_t packetMissedThreshold = 5;
+uint32_t packetMissedThreshold = 9;
 uint32_t packetMissedCount = 0;
 
 bool firstPacket = true;
@@ -102,6 +102,19 @@ void loop() {
 }
 */
 
+
+static void printStatusFlags(uint32_t s)
+{
+    xprintf("Status: 0x%08lX (1=ON/data OK, 0=OFF/no data)\n", (unsigned long)s);
+    xprintf("  BARO  ON=%d  data=%d\n", 1, 0);
+    xprintf("  GPS   ON=%d  data=%d\n", 1,  0);
+    xprintf("  SD    ON=%d  data=%d\n", 1,   0);
+    xprintf("  INA   ON=%d  data=%d\n", 1,  0);
+    xprintf("  IMU   ON=%d  data=%d\n", 1,  0);
+    xprintf("  LoRa  ON=%d  data=%d\n", 1, 0);
+}
+
+
 void loop(){
     lastPacketNumber++;
     uint8_t buf[20];
@@ -113,6 +126,16 @@ void loop(){
 
     TelemetryPacket pkt;
 
+    
+    if (packetMissedCount == packetMissedThreshold - 1) {
+        packetMissedCount = packetMissedCount + 1;
+        Serial.print("Unexpected packet size: ");
+        Serial.print(" (expected ");
+        Serial.print(packetMissedCount);
+        Serial.println(")");
+        return;
+    }
+    
 
     Serial.println("------------------------------------------------");
 
@@ -125,7 +148,7 @@ void loop(){
     if (!firstPacket)
     {
         lastPacketNumber++;
-        pkt.packetNum - lastPacketNumber - 1;
+        pkt.packetNum = lastPacketNumber - 1;
 
         if (packetMissedCount == packetMissedThreshold){
             packetMissedCount = 0;
@@ -178,8 +201,7 @@ void loop(){
     Serial.print("Longitude: ");
     Serial.println(pkt.lon_e7 / 10000000.0, 7);
 
-    Serial.print("Status: 0x");
-    Serial.println(pkt.status, HEX);
+    printStatusFlags(pkt.status);
 
     Serial.print("RSSI: ");
     Serial.print(rssi);

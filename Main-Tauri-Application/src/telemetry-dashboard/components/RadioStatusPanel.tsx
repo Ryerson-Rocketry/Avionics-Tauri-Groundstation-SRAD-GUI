@@ -135,7 +135,7 @@ export function RadioStatusPanel({ telemetry }: RadioStatusPanelProps) {
           </div>
         </div>
         
-        <ComponentStatusGroup componentNames={["Barometer", "GPS", "SD-Readder", "INA", "IMU", "LORA"]} componentStatusBits={telemetry.statusBits} />
+        <ComponentStatusGroup componentNames={["Barometer", "GPS", "SD-Reader", "INA", "IMU", "LORA"]} componentStatusBits={telemetry.statusBits} />
       </div>
 
       
