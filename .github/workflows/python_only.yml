@@ -54,7 +54,7 @@ jobs:
           python -m pip install -r requirements.txt
           pyinstaller --add-data="test_data/test-flight-2026-March-modified.csv:./test_data"  --onefile -n webserver_proc webserver.py
           cd dist
-          cp "webserver_proc-x86_64-unknown-linux-gnu" ./../../_PYTHON
+          cp "webserver_proc" ./../../_PYTHON
           
           cd ../../
           tar -zcvf build.tar.gz "./_PYTHON/"
