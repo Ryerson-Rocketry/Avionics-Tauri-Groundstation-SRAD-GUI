@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'ubuntu-22.04'
+          - platform: 'windows-latest'
             args: ''
 
     runs-on: ${{ matrix.platform }}
@@ -45,16 +45,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-
-      - name: install python dependencies to build local version of webserver binary (LINUX UBUNTU)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
-        run: |
-          cd ./Telemetry-Python-Webserver
-          python -m pip install -r requirements.txt
-          pyinstaller --add-data="test_data/test-flight-2026-March-modified.csv:./test_data"  --onefile -n webserver_proc-x86_64-unknown-linux-gnu webserver.py
-          cd dist
-          cp "webserver_proc-x86_64-unknown-linux-gnu" ./../../Main-Tauri-Application/src-tauri/binaries
-          cd ../../
 
       - name: install python dependencies to build local version of webserver binary (WINDOWS)
         if: matrix.platform == 'windows-latest' # This must match the platform value defined above.
@@ -77,26 +67,15 @@ jobs:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: install frontend dependencies 
-        run: |
+      - name: build and copy to build folder (windows)
+        if: matrix.platform == 'windows-latest'  # This must match the platform value defined above.
+        run: | 
           cd ./Main-Tauri-Application
-          npm install # change this to npm, pnpm or bun depending on which one you use.
-
-      - name: build and copy to build folder (ubuntu)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
-        run: |
-          cd ./Main-Tauri-Application
-          npm run tauri build -- --no-bundle
-          cp -R "./src-tauri/target/release" "./../_BUILD/"
+          npm run tauri build
+          robocopy ".\src-tauri\target\release" ".\../_BUILD/" /MIR
+          if ($lastexitcode -lt 8) { $global:LASTEXITCODE = $null }
           cd ..
-          tar -zcvf build.tar.gz "./_BUILD/"
-          ls 
+          Compress-Archive ./_BUILD ./build.zip
 
       - name: create release
         id: create_release
@@ -113,14 +92,14 @@ jobs:
           draft: true
           prerelease: false
 
-      - name: Upload Release Asset (linux)
-        if: matrix.platform == 'ubuntu-22.04'  # This must match the platform value defined above.
-        id: upload-release-asset-linux
+      - name: Upload Release Asset (windows)
+        if: matrix.platform == 'windows-latest'  # This must match the platform value defined above.
+        id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: build.tar.gz
-          asset_name: build.tar.gz
-          asset_content_type: application/gzip
+          asset_path: build.zip
+          asset_name: build.zip
+          asset_content_type: application/zip
