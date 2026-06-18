@@ -21,9 +21,10 @@ async def serial_connect():
     while(True):
         try:
             ports = serial.tools.list_ports.comports()
-            for port, desc, hwid in sorted(ports):
-                print("INFO: available COM port found at:" + port , flush = True)
-            reader, writer = await serial_asyncio.open_serial_connection(url="/dev/ttyACM0", baudrate=115200)
+            #for port, desc, hwid in sorted(ports):
+            #    print("INFO: available COM port found at:" + port , flush = True)
+            print("INFO: available COM port found at: ttyS0?" , flush = True)
+            reader, writer = await serial_asyncio.open_serial_connection(url="/dev/ttyS0", baudrate=115200)
             print ("SUCCESS: SERIAL CONNECTION MADE. Redirecting back to main serial data read loop", flush = True)
             return reader, writer
         except Exception as e:
