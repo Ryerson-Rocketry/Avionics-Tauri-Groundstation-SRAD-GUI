@@ -21,14 +21,14 @@ async def serial_connect():
     while(True):
         try:
             ports = serial.tools.list_ports.comports()
-            #for port, desc, hwid in sorted(ports):
-            #    print("INFO: available COM port found at:" + port , flush = True)
-            print("INFO: available COM port found at: ttyACM0?" , flush = True)
-            reader, writer = await serial_asyncio.open_serial_connection(url="/dev/ttyACM0", baudrate=115200)
+            for port, desc, hwid in sorted(ports):
+                print("INFO: available COM port found at:" + port , flush = True)
+            print("INFO: available COM port found at: " + port , flush = True)
+            reader, writer = await serial_asyncio.open_serial_connection(url=port, baudrate=115200)
             print ("SUCCESS: SERIAL CONNECTION MADE. Redirecting back to main serial data read loop", flush = True)
             return reader, writer
         except Exception as e:
-            print("ERR: failed to find radio reciever device, trying again... PORT (/dev/ttyACM0)", flush = True)
+            print("ERR: failed to find radio reciever device, trying again...", flush = True)
             ports = serial.tools.list_ports.comports()
             print(e, flush = True)
             await asyncio.sleep(1)
@@ -337,7 +337,7 @@ async def radio_handler(websocket):
                     'y': float(gyro_array[1]),
                     'z': float(gyro_array[2]),
                 },
-                
+
                 #get the magnitude of acceleration
                 "acceleration": round(float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))), 3),
 
