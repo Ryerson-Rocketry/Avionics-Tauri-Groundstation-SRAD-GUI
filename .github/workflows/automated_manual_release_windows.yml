@@ -33,8 +33,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'windows-latest'
-            args: ''
           - platform: 'ubuntu-22.04'
             args: ''
 
@@ -100,16 +98,6 @@ jobs:
           tar -zcvf build.tar.gz "./_BUILD/"
           ls 
 
-      - name: build and copy to build folder (windows)
-        if: matrix.platform == 'windows-latest'  # This must match the platform value defined above.
-        run: | 
-          cd ./Main-Tauri-Application
-          npm run tauri build
-          robocopy ".\src-tauri\target\release" ".\../_BUILD/" /MIR
-          if ($lastexitcode -lt 8) { $global:LASTEXITCODE = $null }
-          cd ..
-          Compress-Archive ./_BUILD ./build.zip
-
       - name: create release
         id: create_release
         uses: actions/create-release@v1
@@ -136,15 +124,3 @@ jobs:
           asset_path: build.tar.gz
           asset_name: build.tar.gz
           asset_content_type: application/gzip
-
-      - name: Upload Release Asset (windows)
-        if: matrix.platform == 'windows-latest'  # This must match the platform value defined above.
-        id: upload-release-asset-windows
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: build.zip
-          asset_name: build.zip
-          asset_content_type: application/zip
