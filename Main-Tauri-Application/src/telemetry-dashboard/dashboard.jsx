@@ -193,7 +193,7 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
         {/*telemetryState === false ? <GaugeGroupPanel className = "dashboardGauge" stats={stats}/> : []*/}
 
         <div className={telemetryState === true ? "dashboardRightNormal" : "dashboardRightExpanded"} >
-          <StatsPanel stats={stats} />
+          <StatsPanel stats={stats} telemetry={telemetry}/>
 
           <ChartGroupPanel chartData={chartData} 
             replay={replay}

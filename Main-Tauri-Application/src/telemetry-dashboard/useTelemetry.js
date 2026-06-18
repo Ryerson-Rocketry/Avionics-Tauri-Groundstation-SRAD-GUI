@@ -165,6 +165,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
 
     acceleration: 0,
     accelAxis: { x: 0, y: 0, z: 0 }, //NEW 06-06
+    gyroAxis: { x: 0, y: 0, z: 0 }, //NEW 06-06
 
     radioInfo: {snr: 0, rssi: 0, callsign: "N/A", freqErr: 0, totalPackets: 0, missedPackets: 0}, //NEW 06-06
     statusBits: 0, //NEW 06-06
@@ -197,22 +198,24 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
                                    dataTemp: {data: [], title: "Temperature", yAxis: "Temp (C)"}});
   */
   const chartMetaData = {
-    alt: {title: "Altitude", yAxis: "Alt (m)"},
+    alt: {title: "Altitude", yAxis: "Alt (feet)"},
     vel: {title: "Velocity", yAxis: "Vel (m/s)"},
     pressure: {title: "Pressure", yAxis: "Pres (mBar)"},
-    acceleration: {title: "Acceleration", yAxis: "Accel (m/s^2"},
-    temp: {title: "Temperature", yAxis: "Temp (C)"}
+    acceleration: {title: "Acceleration", yAxis: "Accel (g)"},
+    temp: {title: "Temperature", yAxis: "Temp (C)"},
+    gyro: {title: "gyro", yAxis: "Gyro (Rad/s)"},
   }
 
   const statsMetaData = {
-    alt: {units: "m"},
+    alt: {units: "feet"},
     vel: {units: "m/s"},
     pressure: {units: "mBar"},
-    acceleration: {units: "m/s²"},
+    acceleration: {units: "g"},
     temp: {units: "°C"},
     battVolt: {units: "V"},
     mainVolt: {units: "V"},
     drogueVolt: {units: "V"},
+    gyro: {units: "rad/s"},
   }
 
 
@@ -439,6 +442,7 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
           orientation: {pitch: raw.orientation.pitch, roll: raw.orientation.roll, yaw: raw.orientation.yaw } || { pitch: 0, roll: 0, yaw: 0 },
           
           accelAxis: {x: raw.acceleration_axis.x,  y: raw.acceleration_axis.y, z: raw.acceleration_axis.z},
+          gyroAxis: {x: raw.gyro_axis.x,  y: raw.gyro_axis.y, z: raw.gyro_axis.z},
           radioInfo: {
             rssi: raw.radio_info.rssi, 
             snr: raw.radio_info.snr, 
@@ -504,6 +508,9 @@ export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMo
             battVolt: dataArrays.battVolt.push(processed.battVolt),
             mainVolt: dataArrays.mainVolt.push(processed.mainVolt),
             drogueVolt: dataArrays.drogueVolt.push(processed.drogueVolt),
+            gyroX: dataArrays.drogueVolt.push(processed.gyroAxis.x),
+            gyroY: dataArrays.drogueVolt.push(processed.gyroAxis.y),
+            gyroZ: dataArrays.drogueVolt.push(processed.gyroAxis.z),
           })
         }
 

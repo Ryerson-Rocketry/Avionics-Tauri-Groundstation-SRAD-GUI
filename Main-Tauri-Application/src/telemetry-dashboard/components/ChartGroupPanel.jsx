@@ -36,7 +36,7 @@ const MAX_GRAPH_ELEMENT_SIZE = 5;
 const DEFAULT_GRAPH_ELEMENT_SIZE = 2.5;
 
 
-const CHART_SINGLE_OPTIONS = ['alt', 'vel', 'acceleration', 'pressure', 'temp'];
+const CHART_SINGLE_OPTIONS = ['alt', 'acceleration', 'pressure', 'temp'];
 
 
 export function ChartGroupPanel({replay, chartData, chartUpdateIntervalSec = 1, setChartUpdateIntervalSec, stats}) {
@@ -246,18 +246,6 @@ export function ChartGroupPanel({replay, chartData, chartUpdateIntervalSec = 1, 
                         graphElementSize={graphElementSize}
                         enableLineDot={enableLineDot}
                         meanData={enableMean === true ? stats['meanAlt'] : null}
-                        enableYAxisAutoScale={enableYAxisAutoscale}
-                    />
-                    
-                    <ChartPanel
-                        data={chartData}
-                        dataKey={'vel'}
-                        chartUpdateIntervalSec={chartUpdateIntervalSec}
-                        onChartUpdateIntervalChange={replay ? undefined : setChartUpdateIntervalSec}
-                        useLineGraph = {useLineGraph}
-                        graphElementSize={graphElementSize}
-                        enableLineDot={enableLineDot}
-                        meanData={enableMean === true ?stats['meanVel'] : null}
                         enableYAxisAutoScale={enableYAxisAutoscale}
                     />
                     <ChartPanel

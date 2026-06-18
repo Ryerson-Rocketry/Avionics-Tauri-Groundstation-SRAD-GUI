@@ -47,16 +47,14 @@ function StatGroup({ label, data, type, hideMinMed, dash, ui, showDetailed, show
       <div style={dash.statLine}>
         <span style={{color: ui.colors.cyan }}>Current</span>
         <span>{data.curr}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
+        <span style={{color: ui.colors.cyan }}>Mean</span>
+        <span>{data.mean}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
       </div>
       <div style={dash.statLine}>
         <span style={{color: ui.colors.cyan }}>Max</span>
         <span>{data.max}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
         <span style={{color: ui.colors.cyan }}>Min</span>
         <span>{data.min}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
-      </div>
-      <div style={dash.statLine}>
-        <span style={{color: ui.colors.cyan }}>Mean</span>
-        <span>{data.mean}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
       </div>
       {showDetailed === true ? <div style={dash.statLine}>
         <span style={{color: ui.colors.cyan }}>STD Dev (Sqrt(Var))</span>
@@ -73,7 +71,63 @@ function StatGroup({ label, data, type, hideMinMed, dash, ui, showDetailed, show
   );
 }
 
-export function StatsPanel({ stats }) {
+
+function StatGroupAcceleration({ label, data, type, hideMinMed, dash, ui, showDetailed, showUnits }) {
+  //const isAlt = type === "alt";
+  //if (!data) return null;
+
+  return (
+    <div style={{ flex: 1 }}>
+      <div style={{ ...dash.statLabel, marginBottom: "0.5vh", color: ui.colors.cyan }}>{label}</div>
+      <div style={dash.statLine}>
+        <span style={{color: ui.colors.cyan }}>Current</span>
+        <span>{data.curr}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
+      </div>
+      <div style={dash.statLine}>
+        <span style={{color: ui.colors.cyan }}>X</span>
+        <span>{data.x}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
+        <span style={{color: ui.colors.cyan }}>Y</span>
+        <span>{data.y}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
+        <span style={{color: ui.colors.cyan }}>Z</span>
+        <span>{data.z}{showUnits === true ? "("+data.metadata.units+")" : <div/>}</span>
+      </div>
+      {showDetailed === true ? <div style={dash.statLine}>
+        <span style={{color: ui.colors.cyan }}>STD Dev (Sqrt(Var))</span>
+        <span>{Math.sqrt(data.variance).toFixed(3)}</span>
+      </div> :
+      <div/>}
+      {showDetailed === true ?
+      <div style={dash.statLine}>
+        <span style={{color: ui.colors.cyan }}>Variance (Var)</span>
+        <span>{data.variance}</span>
+      </div> :
+      <div/>}
+    </div>
+  );
+}
+
+
+function StatGroupGyro({ label, data, type, hideMinMed, dash, ui, showDetailed, showUnits }) {
+  //const isAlt = type === "alt";
+  //if (!data) return null;
+
+  return (
+    <div style={{ flex: 1 }}>
+      <div style={{ ...dash.statLabel, marginBottom: "0.5vh", color: ui.colors.cyan }}>{label}</div>
+      <div style={dash.statLine}>
+        <span style={{color: ui.colors.cyan }}>X</span>
+        <span>{data.x}{showUnits === true ? "(rad/s)" : <div/>}</span>
+        <span style={{color: ui.colors.cyan }}>Y</span>
+        <span>{data.y}{showUnits === true ? "(rad/s)" : <div/>}</span>
+        <span style={{color: ui.colors.cyan }}>Z</span>
+        <span>{data.z}{showUnits === true ? "(rad/s)" : <div/>}</span>
+      </div>
+    </div>
+  );
+}
+
+
+export function StatsPanel({ stats, telemetry }) {
   const { tokens: ui, styles: uiStyles } = useTheme();
   const dash = uiStyles.telemetryDashboard;
 
@@ -103,16 +157,13 @@ export function StatsPanel({ stats }) {
           </div>
       <div style={{ display: "flex", gap: "2vw", marginBottom: "1vw" }}>
         <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"ALTITUDE ("+stats.metadata.alt.units+")"} data={{curr: stats.alt, max: stats.maxAlt, min: stats.minAlt, mean: stats.meanAlt, metadata: stats.metadata.alt, variance: stats.varianceAlt}} type="alt" dash={dash} ui={ui} />
-        <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"VELOCITY ("+stats.metadata.vel.units+")"} data={{curr:stats.vel, max: stats.maxVel, min: stats.minVel, mean: stats.meanVel, metadata: stats.metadata.vel , variance: stats.varianceVel}} type="vel" hideMinMed dash={dash} ui={ui} />
         <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"PRESSURE ("+stats.metadata.pressure.units+")"} data={{curr:stats.pressure, max: stats.maxPressure, min: stats.minPressure, mean: stats.meanPressure, metadata: stats.metadata.pressure , variance: stats.variancePressure}} type="pressure" hideMinMed dash={dash} ui={ui} />
-        <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"ACCELERATION ("+stats.metadata.acceleration.units+")"} data={{curr:stats.acceleration, max: stats.maxAcceleration, min: stats.minAcceleration, mean: stats.meanAcceleration, metadata: stats.metadata.acceleration , variance: stats.varianceAcceleration}} type="acceleration" hideMinMed dash={dash} ui={ui} />
+        <StatGroupAcceleration showDetailed = {showDetailed} showUnits={showUnits} label={"ACCELERATION ("+stats.metadata.acceleration.units+")"} data={{x:telemetry.accelAxis.x , y:telemetry.accelAxis.y , z:telemetry.accelAxis.z , curr:stats.acceleration, max: stats.maxAcceleration, min: stats.minAcceleration, mean: stats.meanAcceleration, metadata: stats.metadata.acceleration , variance: stats.varianceAcceleration}} type="acceleration" hideMinMed dash={dash} ui={ui} />
       </div>
 
       <div style={{ display: "flex", gap: "2vw" }}>
         <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"Temperature ("+stats.metadata.temp.units+")"} data={{curr:stats.temp, max: stats.maxTemp, min: stats.minTemp, mean: stats.meanTemp, metadata: stats.metadata.temp , variance: stats.varianceTemp}} type="temp" hideMinMed dash={dash} ui={ui} />
-        <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"Battery Voltage ("+stats.metadata.battVolt.units+")"} data={{curr:stats.battVolt, max: stats.maxBattVolt, min: stats.minBattVolt, mean: stats.meanBattVolt, metadata: stats.metadata.battVolt, variance: stats.varianceBattVolt }} type="battvolt" hideMinMed dash={dash} ui={ui} />
-        <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"Main Voltage ("+stats.metadata.mainVolt.units+")"} data={{curr:stats.mainVolt, max: stats.maxMainVolt, min: stats.minMainVolt, mean: stats.meanMainVolt, metadata: stats.metadata.mainVolt, variance: stats.varianceMainVolt}} type="mainvolt" hideMinMed dash={dash} ui={ui} />
-        <StatGroup showDetailed = {showDetailed} showUnits={showUnits} label={"Drogue Voltage ("+stats.metadata.drogueVolt.units+")"} data={{curr:stats.drogueVolt, max: stats.maxDrogueVolt, min: stats.minDrogueVolt, mean: stats.meanDrogueVolt, metadata: stats.metadata.drogueVolt, variance: stats.varianceDrogueVolt}} type="droguevolt" hideMinMed dash={dash} ui={ui} />   
+        <StatGroupGyro showDetailed = {showDetailed} showUnits={showUnits} label={"GYRO (rad/s)"} data={{x:telemetry.gyroAxis.x , y:telemetry.gyroAxis.y , z:telemetry.gyroAxis.z , curr:stats.acceleration, max: stats.maxAcceleration, min: stats.minAcceleration, mean: stats.meanAcceleration, metadata: stats.metadata.acceleration , variance: stats.varianceAcceleration}} type="acceleration" hideMinMed dash={dash} ui={ui} />
       </div>
 
       

@@ -260,6 +260,14 @@ async def rocketry_data_file_test_handler(websocket):
                     'y': float(row['acceleration']),
                     'z': float(row['acceleration']),
                 },
+
+                #ACCELERATION AXIS X/Y/Z
+                "gyro_axis": {
+                    'x': float(row['acceleration']),
+                    'y': float(row['acceleration']),
+                    'z': float(row['acceleration']),
+                },
+
                 #get the magnitude of acceleration
                 "acceleration": float(row['acceleration']),
 

@@ -125,16 +125,20 @@ export function HeaderBar({
 
       <div style={{ display: "flex",  flexDirection:"column" , alignItems: "center" }}>
         <div style={{ display: "flex",  alignItems: "center", gap: "1vw"}}>
-          <HeaderStat label={labels.telemetry.statAltitude} val={telemetry.alt} unit="m" isString={false} />
-          <HeaderStat label={labels.telemetry.statVelocity} val={telemetry.vel} unit="m/s" isString={false} />
+          <HeaderStat label={labels.telemetry.statAltitude} val={telemetry.alt} unit="feet" isString={false} />
           {/*<HeaderStat label={labels.telemetry.statMissionTime} val={telemetry.time} unit="s" isString={false} />*/}
-          <HeaderStat label={"ACCELERATION"} val={telemetry.acceleration} unit="m/s^2" isString={false}/>
+          <HeaderStat label={"ACCELERATION"} val={telemetry.acceleration} unit="g" isString={false}/>
+          <HeaderStat label={"ACCEL-X"} val={telemetry.accelAxis.x} unit="g" isString={false}/>
+          <HeaderStat label={"ACCEL-Y"} val={telemetry.accelAxis.y} unit="g" isString={false}/>
+          <HeaderStat label={"ACCEL-Z"} val={telemetry.accelAxis.z} unit="g" isString={false}/>
         </div>
         <div style={{ display: "flex",  alignItems: "center", gap: "1vw"}}>
           <HeaderStat label={"APOGEE"} val={stats.apogee} unit="m" isString={false} />
           <HeaderStat label={"PITCH"} val={telemetry.orientation.pitch} unit="°" isString={false} />
           <HeaderStat label={"ROLL"} val={telemetry.orientation.roll} unit="°" isString={false} />
           <HeaderStat label={"YAW"} val={telemetry.orientation.yaw} unit="°" isString={false} />
+          <HeaderStat label={"LAT"} val={telemetry.pos.x} unit="°" isString={false} />
+          <HeaderStat label={"LONG"} val={telemetry.pos.z} unit="°" isString={false} />
         </div>  
       </div>
 

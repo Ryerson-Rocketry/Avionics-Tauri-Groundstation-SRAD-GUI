@@ -330,13 +330,21 @@ async def radio_handler(websocket):
                     'y': float(accel_array[1]),
                     'z': float(accel_array[2]),
                 },
+
+                #ACCELERATION AXIS X/Y/Z
+                "gyro_axis": {
+                    'x': float(gyro_array[0]),
+                    'y': float(gyro_array[1]),
+                    'z': float(gyro_array[2]),
+                },
+                
                 #get the magnitude of acceleration
-                "acceleration": float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))),
+                "acceleration": round(float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))), 3),
 
                 #MISC DATA POINTS
                 "battVolt": float(battery),
                 "temp": float(temp),
-                "velocity": float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))),
+                "velocity": round(float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))), 3),
                 "pressure": float(pressure),
 
                 #RADIO STUFF
