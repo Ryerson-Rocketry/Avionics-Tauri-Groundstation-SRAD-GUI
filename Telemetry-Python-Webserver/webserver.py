@@ -7,7 +7,9 @@ from websockets.exceptions import ConnectionClosed
 from websockets.exceptions import ConcurrencyError
 
 #for proper file path handling when packaging these files into a binary
-from os import path 
+from os import path
+
+import livestream_handler 
 path_to_dat = path.abspath(path.join(path.dirname(__file__), 'test_data/test-flight-2026-March-modified.csv'))
 
 #for exiting this process
@@ -56,8 +58,6 @@ async def state_handler(websocket):
     print ("AWAITING INITIALIZATION INPUT: ############################", flush = True)
     running = False
 
-    process = None
-
     try:
         async for message in websocket:   
             print ("MESSAGE RECIEVED:", flush = True)
@@ -68,11 +68,14 @@ async def state_handler(websocket):
                         print ("TELEMETRY IN DEMO MODE ----------", flush = True)
                         running = True
                         await rocketry_data_file_test_handler(websocket)
-                        
                     case "live":
                         print ("TELEMETRY IN LIVE MODE ----------", flush = True)
                         running = True
                         await radio_handle(websocket)
+                    case "livestream":
+                        print ("LIVESTREAM PROCESS LAUNCHED ----------", flush = True)
+                        running = True
+                        await livestream_handler.livestream_process_handler(websocket)
                     case _:
                         print ("INVALID CASE", flush = True)
             else:

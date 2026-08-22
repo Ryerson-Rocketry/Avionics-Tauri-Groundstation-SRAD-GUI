@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useTelemetry } from "./useTelemetry";
+import { useLivestream } from "./useLivestream";
 import { SimViewPanel } from "./components/SimViewPanel";
 import { ChartPanel } from "./components/ChartPanel.jsx";
 import { StatsPanel } from "./components/StatsPanel";
@@ -19,6 +20,7 @@ import { ChartGroupPanel } from "./components/ChartGroupPanel.jsx";
 import "./dashboard.css";
 import { GaugeGroupPanel } from "./components/GaugeGroupPanel.jsx";
 import { RadioStatusPanel } from "./components/RadioStatusPanel";
+import LivestreamPlayer from "./livestream/LivestreamPlayer.jsx";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -77,6 +79,10 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
     useDemoMode,
     dummyMode
   );
+
+  
+  //const stream = useLivestream();
+  
   
 
   const handleExit = useCallback(async () => {
@@ -177,14 +183,15 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
       />
 
       <main className="dashboardGrid" >
+        
         <div className={telemetryState === true ? "dashboardLeftNormal" : "dashboardLeftExpanded"} >
+          <LivestreamPlayer />
           <SimViewPanel
           telemetry={telemetry}
           history={history}
           rocketPos={rocketPos}
           isLocked={isLocked}
-          />
-          
+          /> 
             {telemetryState === false ? /*<GaugeGroupPanel className = "dashboardGauge" stats={stats}/>*/ <div style={{height: "18vh"}}> <RadioStatusPanel telemetry={telemetry} ></RadioStatusPanel> </div> : [] }
           
         </div>

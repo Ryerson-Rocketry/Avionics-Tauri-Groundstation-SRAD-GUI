@@ -245,7 +245,7 @@ async def radio_handler(websocket):
             accel_array[0] = re.sub('[^0-9,.,-]', '', accel_array[0])
             accel_array[1] = re.sub('[^0-9,.,-]', '', accel_array[1])
             accel_array[2] = re.sub('[^0-9,.,-]', '', accel_array[2])
-            #print ("accel x/y/z: " +  str(accel_array[0]) + " " +  (accel_array[1]) + " " + (accel_array[2]))
+            print ("accel x/y/z: " +  str(accel_array[0]) + " " +  (accel_array[1]) + " " + (accel_array[2]))
 
             #THESE ARE RAW GYRO STUFF, DO NOT USE
             gyro_array = packet[4].split(":")
@@ -339,12 +339,12 @@ async def radio_handler(websocket):
                 },
 
                 #get the magnitude of acceleration
-                "acceleration": round(float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))), 3),
+                "acceleration": round(float(np.linalg.norm(np.array([0,0,0]))), 3),
 
                 #MISC DATA POINTS
                 "battVolt": float(battery),
                 "temp": float(temp),
-                "velocity": round(float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))), 3),
+                "velocity": round(float(np.linalg.norm(np.array([0,0,0]))), 3),
                 "pressure": float(pressure),
 
                 #RADIO STUFF

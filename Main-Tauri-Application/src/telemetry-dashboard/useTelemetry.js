@@ -116,9 +116,6 @@ const DEFAULT_CHART_INTERVAL_SEC = 1;
 //where dummy mode = don't actually run the thing
 export function useTelemetry(isLive, socketUrl, profile, options = {}, useDemoMode, dummyMode) {
 
-
-  
-
   const chartIntervalSec = Math.max(0.1, Number(options.chartUpdateIntervalSeconds) || DEFAULT_CHART_INTERVAL_SEC);
   const chartIntervalMs = chartIntervalSec * 1000;
   const recordingSaveDirName = options.recordingSaveDirName ?? null;
