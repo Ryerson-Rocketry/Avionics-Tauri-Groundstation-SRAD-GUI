@@ -3,6 +3,10 @@ Last modified (2026-08-31)
 
 GUI is to support a livestream from the Control Systems team. Planning to do a full rewrite of the frontend and backend. Therefore for now this is just a proof of concept to figure out how to get data from a video source, send it to the frontend, and play it (with acceptable quality).
 
+| Demo                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------------- |
+| <img width="800" height="450" alt="Image" src="https://github.com/user-attachments/assets/c65c2c8f-b598-40ff-811d-c2e71bddf603" /> |
+
 # Requirements
 - Overlay Avionics GUI elements atop the livestream
 - Capture livestream data (from video capture card)
