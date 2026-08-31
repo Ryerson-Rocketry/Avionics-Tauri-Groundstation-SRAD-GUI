@@ -21,6 +21,7 @@ import apogeeMarker from "../../../assets/map/apogee_marker.png";
 import launchMarker from "../../../assets/map/launch_marker.png";
 import Typography from "@mui/material/Typography";
 import NavBallScene from "../simulator/NavBallScene.jsx";
+import LivestreamPlayer from "../livestream/LivestreamPlayer.jsx";
 
 export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
   const { tokens: ui, styles: uiStyles } = useTheme();
@@ -46,9 +47,9 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
   const[showLabel, setShowLabel] = useState(false);
   const[showPath, setShowPath] = useState(true);
 
-  //TEMP
+  //TEMPS
   const styles = uiStyles.telemetryDashboard;
-
+  const[showLivestream, setLivestream] = useState(false); //false map, true livestream
 
   const [simOffset, setSimOffset] = useState({x: 0, y: 0, z:0});
 
@@ -67,9 +68,6 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
 
   return (
     <section style={{ gridColumn: "1", gridRow: "1", display: "flex", height:"70vh" /*, borderColor: "aqua", borderStyle: "dashed" */ }}>
-
-
-
       <div style={{ ...dash.glassPane, flex: 1, display: "flex", flexDirection: "column" }}>
 
         <div style={{ ...dash.cardHeader, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
@@ -144,6 +142,9 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
           <Button size="sm" variant="outline" outlineColor={ui.colors.red} textColor={ui.colors.red} onClick={() => setMapState(!mapState)}>
               {mapState === true ? '2D Map' : '3D Map'}
           </Button>
+          <Button size="sm" variant="outline" outlineColor={ui.colors.red} textColor={ui.colors.red} onClick={() => setLivestream(!showLivestream)}>
+              {showLivestream === true ? 'Map' : 'Livestream'}
+          </Button>
 
             <Button  size="sm" variant="outline" outlineColor={showLabel === false ? ui.colors.red: ui.colors.green} textColor={showLabel === false ? ui.colors.red: ui.colors.green} onClick={() => setShowLabel(!showLabel)}>
               Labels
@@ -167,74 +168,79 @@ export function SimViewPanel({ telemetry, history, rocketPos, isLocked }) {
 
         
 
-
-        <div style={{ flex: 2, minHeight: 0, position: 'relative' }}>
-          
-          {showLegend === true 
-            ?
-            <div style={{ ...dash.glassPane,  padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", right: 0, top: 0, marginTop: "auto",marginBottom: "auto", zIndex:1000 }}>
-              <Typography> Legend </Typography>
-              <div style={{display: 'flex', flexDirection:'row'}}>
-                  <img src={rocketMarker} height={20} width={20}/>
-                  <Typography> = Rocket </Typography> 
-              </div>
-              <div style={{display: 'flex', flexDirection:'row'}}>
-                  <img src={apogeeMarker} height={20} width={20}/>
-                  <Typography> = Apogee Point </Typography> 
-              </div>
-              <div style={{display: 'flex', flexDirection:'row'}}>
-                  <img src={launchMarker} height={20} width={20}/>
-                  <Typography> = Launch Site </Typography> 
-              </div>
-            </div>
-            :
-            []
-          }
-
-          {showAlitimeter === true 
-            ?
-            <div style={{ ...dash.glassPane,  height: "50%", padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", left: 0, bottom: 0,top: 0, marginTop: "auto",marginBottom: "auto", zIndex:1000 }}>
-              {rocketPos.apogeePoint.y < 3000 ? 3000 : (rocketPos.apogeePoint.y + rocketPos.apogeePoint.y*0.05).toFixed()} m
-              <Altimeter rocketPos={rocketPos} maxSliderValue={3000}/>
-              0 m
-            </div>
-            :
-            []
-          }
         
-          {mapState === true ?
-          <div>
-            <TelemetrCesiumScene
-              telemetry={telemetry}
-              history={history}
-              rocketPos={rocketPos}
-              isTrackOn={isLocked}
-              groundLevelOffset={groundLevelOffset}
-              satView={satView}
-              darkMode={true}
-              bgColor="rgba(5,5,8,0.95)"
-              zoomDistance={reconstructionZoomLevel}
-
-              localHosting={localHosting}
-
-              showPath={showPath}
-              showLabel={showLabel}
-            />
-            <div style={{ ...dash.glassPane, width: "25%", height: "25%", position: "absolute", bottom: 10, right: 10, zIndex:100, borderStyle: 'solid', borderWidth: '10px' }}> 
-
-                <GpsScene localHosting={localHosting} satView={satView} targetPos = {rocketPos} zoom = {gpsZoomLevel} showLabel={showLabel} showPath={showPath}></GpsScene>  
-      
-            </div>
+        <div style={{ flex: 2, minHeight: 0, position: 'relative' }}>
+          {showLivestream === true ?
+            <LivestreamPlayer/>
+            :
             
-            <div style={{ width: "25%", height: "25%", padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", right: 0, left: 0, bottom: 0, marginLeft: "auto",marginRight: "auto", zIndex:1000 }}>
-              <NavBallScene orientation={telemetry.orientation}/>
-            </div>
+            <>
+              {showLegend &&
+              <div style={{ ...dash.glassPane,  padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", right: 0, top: 0, marginTop: "auto",marginBottom: "auto", zIndex:1000 }}>
+                <Typography> Legend </Typography>
+                <div style={{display: 'flex', flexDirection:'row'}}>
+                    <img src={rocketMarker} height={20} width={20}/>
+                    <Typography> = Rocket </Typography> 
+                </div>
+                <div style={{display: 'flex', flexDirection:'row'}}>
+                    <img src={apogeeMarker} height={20} width={20}/>
+                    <Typography> = Apogee Point </Typography> 
+                </div>
+                <div style={{display: 'flex', flexDirection:'row'}}>
+                    <img src={launchMarker} height={20} width={20}/>
+                    <Typography> = Launch Site </Typography> 
+                </div>
+              </div>}
 
-          </div>
-          
-          :
-          <GpsScene localHosting={localHosting} satView={satView} targetPos={rocketPos} zoom={gpsZoomLevel} showLabel={showLabel} showPath={showPath}/>
-          }
+              {showAlitimeter &&
+              <div style={{ ...dash.glassPane,  height: "50%", padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", left: 0, bottom: 0,top: 0, marginTop: "auto",marginBottom: "auto", zIndex:1000 }}>
+                {rocketPos.apogeePoint.y < 3000 ? 3000 : (rocketPos.apogeePoint.y + rocketPos.apogeePoint.y*0.05).toFixed()} m
+                <Altimeter rocketPos={rocketPos} maxSliderValue={3000}/>
+                0 m
+              </div>
+              }
+
+              {mapState === true ?
+                <div>
+                  <TelemetrCesiumScene
+                    telemetry={telemetry}
+                    history={history}
+                    rocketPos={rocketPos}
+                    isTrackOn={isLocked}
+                    groundLevelOffset={groundLevelOffset}
+                    satView={satView}
+                    darkMode={true}
+                    bgColor="rgba(5,5,8,0.95)"
+                    zoomDistance={reconstructionZoomLevel}
+
+                    localHosting={localHosting}
+
+                    showPath={showPath}
+                    showLabel={showLabel}
+                  />
+                  <div style={{ ...dash.glassPane, width: "25%", height: "25%", position: "absolute", bottom: 10, right: 10, zIndex:100, borderStyle: 'solid', borderWidth: '10px' }}> 
+
+                      <GpsScene localHosting={localHosting} satView={satView} targetPos = {rocketPos} zoom = {gpsZoomLevel} showLabel={showLabel} showPath={showPath}></GpsScene>  
+            
+                  </div>
+                  
+                  <div style={{ width: "25%", height: "25%", padding: "1.2vh 1.2vw", overflow: 'visible', display: 'flex', flexDirection:'column', position: "absolute", right: 0, left: 0, bottom: 0, marginLeft: "auto",marginRight: "auto", zIndex:1000 }}>
+                    <NavBallScene orientation={telemetry.orientation}/>
+                  </div>
+
+                </div>
+                
+                :
+                <GpsScene localHosting={localHosting} satView={satView} targetPos={rocketPos} zoom={gpsZoomLevel} showLabel={showLabel} showPath={showPath}/>
+                }
+              
+            </>
+              
+
+            
+
+
+           }       
           
         </div>
       </div>

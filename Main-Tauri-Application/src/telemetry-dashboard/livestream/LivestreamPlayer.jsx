@@ -10,7 +10,7 @@ export default function LivestreamPlayer({}) {
       let queue = [];
 
       let socket;
-      socket = new WebSocket("ws://localhost:8765");
+      socket = new WebSocket("ws://localhost:8765"); //i love hardcoding ports!
       socket.binaryType = "arraybuffer";
       setSocketOBJ(socket);
 
@@ -54,7 +54,7 @@ export default function LivestreamPlayer({}) {
         */
 
 
-          // When a chunk of data is received from the WebSocket
+        // When a chunk of data is received from the WebSocket
         socket.onmessage = (event) => {
           //const arrayU8 = new Uint8Array(event.data);
           // Check if the MediaSource is still open
@@ -70,7 +70,8 @@ export default function LivestreamPlayer({}) {
             console.log('Media source is not in open state: ', mediaSource.readyState);
           }
         };
-        
+
+        //When the MSE is finished appending a given chunk of data, we can append new ones in from the queue if required
         sourceBuffer.addEventListener(
           "update",
           (event) =>{
@@ -185,13 +186,12 @@ export default function LivestreamPlayer({}) {
             
     <video
       ref={videoRef}
-      controls
       autoPlay
       muted
       playsInline
       style={{
         width: "100%",
-        maxWidth: "800px",
+        height:"100%"
       }}
     />
 

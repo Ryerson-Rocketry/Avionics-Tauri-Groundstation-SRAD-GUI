@@ -185,7 +185,7 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
       <main className="dashboardGrid" >
         
         <div className={telemetryState === true ? "dashboardLeftNormal" : "dashboardLeftExpanded"} >
-          <LivestreamPlayer />
+
           <SimViewPanel
           telemetry={telemetry}
           history={history}
