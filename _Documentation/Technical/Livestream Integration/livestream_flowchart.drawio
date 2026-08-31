@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="fkVGijJkXjcOEc4zmiey" name="Page-1">
-        <mxGraphModel dx="3241" dy="1144" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2760" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -25,7 +25,7 @@
                         <mxPoint x="27" y="-1" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="10" value="Connected to Laptop (Control System)" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="10" value="Reciever (Control System)" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="-10" y="280" width="470" height="180" as="geometry"/>
                 </mxCell>
                 <mxCell id="3" value="Capture Card" style="whiteSpace=wrap;html=1;" parent="10" vertex="1">
@@ -83,7 +83,7 @@
                         <mxPoint x="1" y="12" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="24" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="19" target="13" edge="1">
+                <mxCell id="24" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" parent="1" source="19" target="13" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="19" value="Built in MSE (Embedded in webview itself) can automatically decode and append to a video buffer that can be autoplayed (can thus just send the raw data from the buffer into frontend (without worrying about which frame the data is in) (P.S this was a pain in the ass to deal with cause theres not much docs on this)" style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
@@ -95,22 +95,13 @@
                 <mxCell id="28" value="TBD" style="whiteSpace=wrap;" parent="25" vertex="1">
                     <mxGeometry x="130" y="190" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="36" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;curved=0;endArrow=classic;endFill=1;" parent="1" source="31" target="28" edge="1">
+                <mxCell id="69" style="edgeStyle=none;html=1;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" edge="1" parent="1" source="31">
                     <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="1300" y="350"/>
-                        </Array>
+                        <mxPoint x="1300" y="350" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="31" value="No clue what to do here yet, this is a later problem (have to wait for control systems). &#xa;&#xa;Will have to figure out how to actually &#xa;send the livestream with overlayed telemetry to some destination later" style="shape=note;size=15;align=left;spacingLeft=10;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
                     <mxGeometry x="1210" y="490" width="180" height="90" as="geometry"/>
-                </mxCell>
-                <mxCell id="34" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;rounded=0;curved=0;endArrow=none;endFill=0;" parent="1" source="13" target="31" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="1300" y="350"/>
-                        </Array>
-                    </mxGeometry>
                 </mxCell>
                 <mxCell id="39" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="52" target="2" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -118,27 +109,22 @@
                         <mxPoint x="-110" y="349.5" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="40" value="VTX Signal" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="39" vertex="1" connectable="0">
-                    <mxGeometry x="-0.0545" y="3" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="47" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" parent="1" source="46" target="12" edge="1">
+                <mxCell id="47" style="edgeStyle=none;html=1;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" parent="1" source="46" target="12" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="46" value="When dashboard is entered, websocket opened from frontend side telling it to launch a FFmpeg subprocess to monitor a video source, convert it to a streamable format (i.e Fmp4), then pipe it to the webserver who reads and sends it asyncronously to the frontend." style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
                     <mxGeometry x="750" y="490" width="180" height="90" as="geometry"/>
                 </mxCell>
-                <mxCell id="49" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="48" target="8" edge="1">
+                <mxCell id="49" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" parent="1" source="48" target="8" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="48" value="Proof of concept uses FFmpeg for now, there is approximately a 2-3 second delay to stream (FFmpeg essentially probes ahead and keeps some data buffered for processing), might thus use something else." style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
                     <mxGeometry x="520" y="490" width="180" height="90" as="geometry"/>
                 </mxCell>
-                <mxCell id="51" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="50" target="3" edge="1">
+                <mxCell id="51" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" parent="1" source="50" target="3" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="50" value="Or just anything tbh that converts the raw 3.5mm CVBS NTSC/PAL signal into something digital" style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
+                <mxCell id="50" value="Or just anything tbh that converts the raw 3.5mm CVBS NTSC/PAL signal into something actually readable" style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
                     <mxGeometry x="220" y="490" width="180" height="90" as="geometry"/>
                 </mxCell>
                 <mxCell id="53" value="Rocket (Control Systems)" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -165,13 +151,16 @@
                 <mxCell id="64" value="Based off of testing, there are no issues with doing this and reading data from avionics telemetry at the same time" style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
                     <mxGeometry x="750" y="590" width="180" height="90" as="geometry"/>
                 </mxCell>
-                <mxCell id="67" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" parent="1" source="66" edge="1">
+                <mxCell id="67" style="edgeStyle=none;html=1;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" parent="1" source="66" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="650" y="290" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="66" value="If somehow the FFmpeg process prematurely terminates because capture card disconnects partway through or smth, I can do smth similar to the avionics radio reciever whereby we can periodically check if capture card is connected again as a device before relaunching FFmpeg to resume the stream." style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="440" width="180" height="90" as="geometry"/>
+                    <mxGeometry x="520" y="20" width="180" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="68" style="edgeStyle=none;html=1;" edge="1" parent="1" source="13" target="28">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
