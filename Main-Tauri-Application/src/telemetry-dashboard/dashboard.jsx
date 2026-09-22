@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useTelemetry } from "./useTelemetry";
-import { useLivestream } from "./useLivestream";
 import { SimViewPanel } from "./components/SimViewPanel";
 import { ChartPanel } from "./components/ChartPanel.jsx";
 import { StatsPanel } from "./components/StatsPanel";
@@ -185,7 +184,6 @@ export default function Dashboard({ profile, onAbort, socketUrl, saveDirName, re
       <main className="dashboardGrid" >
         
         <div className={telemetryState === true ? "dashboardLeftNormal" : "dashboardLeftExpanded"} >
-
           <SimViewPanel
           telemetry={telemetry}
           history={history}
