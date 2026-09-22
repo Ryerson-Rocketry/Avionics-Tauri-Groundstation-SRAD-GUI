@@ -12,9 +12,7 @@ import time as t
 from websockets.exceptions import ConnectionClosedOK
 
 
-import serial.tools.list_ports
-
-from utility import get_pitch_yaw #https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python 
+import serial.tools.list_ports #https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python 
 
 #TODO: MUST CHECK IF WEBSOCKET HAS DISCONNECTED DURING THIS LOOP, ELSE SHIT IS STUCK
 async def serial_connect():
@@ -23,7 +21,6 @@ async def serial_connect():
             ports = serial.tools.list_ports.comports()
             for port, desc, hwid in sorted(ports):
                 print("INFO: available COM port found at:" + port , flush = True)
-            print("INFO: available COM port found at: " + port , flush = True)
             reader, writer = await serial_asyncio.open_serial_connection(url=port, baudrate=115200)
             print ("SUCCESS: SERIAL CONNECTION MADE. Redirecting back to main serial data read loop", flush = True)
             return reader, writer
@@ -37,24 +34,16 @@ async def serial_connect():
 """ ASSUME FOLLOWING IS THE FORMAT OF DATA
 ------------------------------------------------
 Callsign: CUMMER1
-Packet #: 19
-Unexpected packet size: $ (expected 3)
-Missed packets: 1
-Battery: 8.91 V
-Accel X/Y/Z: -0.53, -31.06, 15.40 g
-Gyro X/Y/Z: -1.89, 16.27, 15.96 rad/s
-Temp: 221.84 C
-Pressure: 4390.40 mbar
-Altitude: -13638 ft
-Latitude: 0.0028822
-Longitude: 0.0036949
-Status: 0xC46535FF (1=ON/data OK, 0=OFF/no data)
-  BARO  ON=1  data=0
-  GPS   ON=1  data=0
-  SD    ON=1  data=0
-  INA   ON=1  data=0
-  IMU   ON=1  data=0
-  LoRa  ON=1  data=0
+Packet #: 129
+Battery: 41.81 V
+Accel X/Y/Z: 8.10, 0.99, -7.85 g
+Gyro X/Y/Z: 7.01, 6.18, 24.90 rad/s
+Temp: -267.68 C
+Pressure: 2173.30 mbar
+Altitude: 6050 ft
+Latitude: 0.0051835
+Longitude: 0.0044057
+Status: 0xC46535FF
 RSSI: 100 dBm
 SNR: -96000 dB
 Freq Error: 433 Hz
@@ -152,7 +141,6 @@ async def radio_handler(websocket):
 
 
 #Assumed format of main data string: timestamp [0], x [1], y [2], z [3], battVolt [4], temp [5], press [6], speed [7], acceleration [8]
-#NOTES: several data points are faked: velocity, yaw, and pitch
 async def radio_handler(websocket):
     print ("INFO: ATTEMPTING CONNECTION, WILL SHOW MESSAGE IF CONNECTED", flush = True)
 
@@ -161,8 +149,6 @@ async def radio_handler(websocket):
     missed_packets = 0
     total_packets = 0
 
-    prev_coord = None
-
     while True:   
 
         packet = []
@@ -170,11 +156,12 @@ async def radio_handler(websocket):
         full_packet_recieved = False
         while full_packet_recieved == False:
             try:
+                
                 line = await reader.readline()
                 str_line = str(line, 'utf-8')
                 str_line = str_line.replace("\n", "")
                 str_line = str_line.replace("\r", "")
-                #print (str_line)
+                print (str_line)
 
                 #len(packet) == 0 to check if this is the very first ---- 
                 
@@ -185,17 +172,13 @@ async def radio_handler(websocket):
                         full_packet_recieved = True
                     else:
                         print ("INFO: IRREGULAR PACKET LENGTH FOUND (NOT 14 LINES); REJECTING PACKET; DELETING PACKET, WILL TRY AGAIN", flush = True)
-                        #print ("PACKET WAS" + str(packet))
                         packet = []
-                
-                if str_line.startswith(' '): #ignore the status bit readout stuff
-                    pass
 
                 #ignore if it is the very first shit
                 elif "------------------------------------------------" in str_line and (len(packet) == 0):
                     pass
                 else:
-                    if ("Missed packets:" not in str_line) and ("Unexpected packet size" not in str_line):
+                    if "Missed packets:" not in str_line:
                         packet.append(str_line)
                         total_packets += 1
                     else:
@@ -245,17 +228,14 @@ async def radio_handler(websocket):
             accel_array[0] = re.sub('[^0-9,.,-]', '', accel_array[0])
             accel_array[1] = re.sub('[^0-9,.,-]', '', accel_array[1])
             accel_array[2] = re.sub('[^0-9,.,-]', '', accel_array[2])
-            print ("accel x/y/z: " +  str(accel_array[0]) + " " +  (accel_array[1]) + " " + (accel_array[2]))
+            #print ("accel x/y/z: " +  str(accel_array[0]) + " " +  (accel_array[1]) + " " + (accel_array[2]))
 
-            #THESE ARE RAW GYRO STUFF, DO NOT USE
             gyro_array = packet[4].split(":")
             gyro_array = gyro_array[1].split(", ")
             gyro_array[0] = re.sub('[^0-9,.,-]', '', gyro_array[0])
             gyro_array[1] = re.sub('[^0-9,.,-]', '', gyro_array[1])
             gyro_array[2] = re.sub('[^0-9,.,-]', '', gyro_array[2])
             #print ("gyro x/y/z: " +  str(gyro_array[0]) + " " +  (gyro_array[1]) + " " + (gyro_array[2]))
-
-
 
             temp = packet[5].split(" ")
             temp = temp[1]
@@ -266,39 +246,30 @@ async def radio_handler(websocket):
             #print ("pressure: " + pressure)
 
             altitude = packet[7].split(" ")
-            altitude = float(altitude[1])
-            #print ("altitude: " + str(altitude))
+            altitude = altitude[1]
+            #print ("altitude: " + altitude)
 
             lat = packet[8].split(" ")
-            lat = float(lat[1])
-            #print ("lat: " + str(lat))
+            lat = lat[1]
+            #print ("lat: " + lat)
             long = packet[9].split(" ")
-            long = float(long[1])
-            #print ("long: " + str(long))
+            long = long[1]
+            #print ("long: " + long)
 
-
-            #Status: 0xC46535FF (1=ON/data OK, 0=OFF/no data) - example
             status = packet[10].split(" ")
-            status = int(status[1], 0) #python can auto detect hex
-            #print ("status: " + str(status))
-
-            if (prev_coord != None):
-                temp_pitch, temp_yaw = get_pitch_yaw( [float(lat), float(long), float(altitude) ], prev_coord)
-                yaw = -temp_yaw + 86 # + 86 cause its for some reason tangent to line
-            else:
-                yaw = 0
-
+            status = status[1]
+            #print ("status: " + status)
 
             rssi = packet[11].split(" ")
             rssi = rssi[1]
             #print ("rssi: " + rssi)
 
             snr = packet[12].split(" ")
-            snr = snr[1]
+            snr = rssi[1]
             #print ("snr: " + snr)
 
             freq_err = packet[13].split(" ")
-            freq_err = freq_err[2]
+            freq_err = rssi[1]
             #print ("freq_err: " + freq_err)
 
             data = {
@@ -319,9 +290,9 @@ async def radio_handler(websocket):
 
                 #GYRO X/Y/Z (ASSUMING CONVERTED TO PITCH/ROLL/YAW)
                 "orientation": {
-                'pitch': 90,
-                'roll': 0,
-                'yaw': yaw,
+                'pitch': float(gyro_array[0]),
+                'roll': float(gyro_array[1]),
+                'yaw': float(gyro_array[2]),
                 },
                 
                 #ACCELERATION AXIS X/Y/Z
@@ -330,21 +301,13 @@ async def radio_handler(websocket):
                     'y': float(accel_array[1]),
                     'z': float(accel_array[2]),
                 },
-
-                #ACCELERATION AXIS X/Y/Z
-                "gyro_axis": {
-                    'x': float(gyro_array[0]),
-                    'y': float(gyro_array[1]),
-                    'z': float(gyro_array[2]),
-                },
-
                 #get the magnitude of acceleration
-                "acceleration": round(float(np.linalg.norm(np.array([0,0,0]))), 3),
+                "acceleration": float(np.linalg.norm(np.array([accel_array[0],accel_array[1],accel_array[2]]))),
 
                 #MISC DATA POINTS
                 "battVolt": float(battery),
                 "temp": float(temp),
-                "velocity": round(float(np.linalg.norm(np.array([0,0,0]))), 3),
+                "velocity": 1000,
                 "pressure": float(pressure),
 
                 #RADIO STUFF
@@ -353,7 +316,7 @@ async def radio_handler(websocket):
                     "snr": float(snr),
                     "freqError": float(freq_err),
                     "callsign": callsign,
-                    "totalPackets": int(timestamp),
+                    "totalPackets": total_packets,
                     "missedPackets": missed_packets
                 },
      
@@ -367,7 +330,6 @@ async def radio_handler(websocket):
             }
 
             await websocket.send(json.dumps(data))
-            prev_coord = [float(lat), float(long), float(altitude)]
 
 
         except ConnectionClosedOK:
@@ -385,7 +347,7 @@ async def radio_handler(websocket):
                     print ("SUCCESS: successful reconnect, returning to main loop", flush = True)
 
                 case _:
-                    print("ERR: unknown error, it is: " + str(e), flush = True)
+                    print("ERR: unknown error, fuck if i know: " + str(e), flush = True)
 
                     
 #pass some fake shit in when ussing the standalone moc test

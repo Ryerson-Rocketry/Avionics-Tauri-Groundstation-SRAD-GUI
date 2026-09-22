@@ -23,6 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+ffmpeg.exe
+*.mp4
+
 Telemetry-Python-Webserver/build/*
 Telemetry-Python-Webserver/.venv/*
 _Build/*

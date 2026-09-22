@@ -57,7 +57,7 @@ function ComponentStatusGroup({componentNames = [], componentStatusBits}: Compon
             <div style={{ ...dash.statLabel, color: ui.colors.cyan }}>{name}</div>
             <div style={dash.statLine}>
               <span style={{color: ui.colors.cyan }}>Status:</span>
-              <span>{"Working"}</span>
+              <span>{componentStatusBits.toString(2).charAt(componentStatusBitIndex) == "1" ? "Working" : "Error"}</span>
             </div>
           </div>
         )
@@ -135,7 +135,7 @@ export function RadioStatusPanel({ telemetry }: RadioStatusPanelProps) {
           </div>
         </div>
         
-        <ComponentStatusGroup componentNames={["Barometer", "GPS", "SD-Reader", "INA", "IMU", "LORA"]} componentStatusBits={telemetry.statusBits} />
+        <ComponentStatusGroup componentNames={["Barometer", "GPS", "SD-Readder", "INA", "IMU", "LORA"]} componentStatusBits={telemetry.statusBits} />
       </div>
 
       

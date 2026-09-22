@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="fkVGijJkXjcOEc4zmiey" name="Page-1">
-        <mxGraphModel dx="2760" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2166" dy="519" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -95,7 +95,7 @@
                 <mxCell id="28" value="TBD" style="whiteSpace=wrap;" parent="25" vertex="1">
                     <mxGeometry x="130" y="190" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="69" style="edgeStyle=none;html=1;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" edge="1" parent="1" source="31">
+                <mxCell id="69" style="edgeStyle=none;html=1;endArrow=none;endFill=0;fillColor=#60a917;strokeColor=#2D7600;" parent="1" source="31" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1300" y="350" as="targetPoint"/>
                     </mxGeometry>
@@ -159,7 +159,7 @@
                 <mxCell id="66" value="If somehow the FFmpeg process prematurely terminates because capture card disconnects partway through or smth, I can do smth similar to the avionics radio reciever whereby we can periodically check if capture card is connected again as a device before relaunching FFmpeg to resume the stream." style="shape=note;size=15;align=left;spacingLeft=10;html=1;whiteSpace=wrap;fontSize=8;" parent="1" vertex="1">
                     <mxGeometry x="520" y="20" width="180" height="90" as="geometry"/>
                 </mxCell>
-                <mxCell id="68" style="edgeStyle=none;html=1;" edge="1" parent="1" source="13" target="28">
+                <mxCell id="68" style="edgeStyle=none;html=1;" parent="1" source="13" target="28" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
             </root>
