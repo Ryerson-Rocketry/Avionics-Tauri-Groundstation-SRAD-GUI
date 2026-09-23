@@ -31,3 +31,13 @@ Telemetry-Python-Webserver/.venv/*
 _Build/*
 Main-Tauri-Application/src-tauri/binaries/*
 !Main-Tauri-Application/src-tauri/binaries/binarieshere.txt
+.obsidian/workspace.json
+
+#ignore mapserver shit
+*.mbtiles
+martin-x86_64-pc-windows-msvc
+martin-x86_64-pc-windows-msvc.zip
+
+#ignore ffmpeg shit
+ffmpeg.exe
+
