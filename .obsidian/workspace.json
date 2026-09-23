@@ -1,14 +1,14 @@
 {
   "main": {
-    "id": "fa8e647b7fa02fb6",
+    "id": "3d81aa022dad42a0",
     "type": "split",
     "children": [
       {
-        "id": "f672fd541971b012",
+        "id": "0c71dbcccf756243",
         "type": "tabs",
         "children": [
           {
-            "id": "be8f503fc7518c03",
+            "id": "95002c9308219005",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "eed6e817fe0caa42",
+    "id": "72f88c6470b09701",
     "type": "split",
     "children": [
       {
-        "id": "c3b25216e4bfee02",
+        "id": "6245f042c6cc8e7a",
         "type": "tabs",
         "children": [
           {
-            "id": "9cbb3483aee0ab23",
+            "id": "50cb9a3db5fdf23d",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -50,7 +50,7 @@
             }
           },
           {
-            "id": "93f1eabba0f81628",
+            "id": "c35c3c0cdcd96afa",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -67,11 +67,14 @@
             }
           },
           {
-            "id": "b0224fd56ed136cb",
+            "id": "a76a28d094827f86",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {},
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
               "icon": "lucide-bookmark",
               "title": "Bookmarks"
             }
@@ -83,19 +86,20 @@
     "width": 300
   },
   "right": {
-    "id": "2eced59270fe89de",
+    "id": "0bb6d7ee6d44e0e6",
     "type": "split",
     "children": [
       {
-        "id": "4bb66e41b95c1824",
+        "id": "c5cc0bdb98d0920f",
         "type": "tabs",
         "children": [
           {
-            "id": "65d5b91b94da652d",
+            "id": "87355b9881c716b4",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -109,11 +113,12 @@
             }
           },
           {
-            "id": "3019f6bd339406d6",
+            "id": "c9b155ffb726df7f",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -122,7 +127,7 @@
             }
           },
           {
-            "id": "62973a3bfa5df986",
+            "id": "a4d92d623f8a8674",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,7 +142,7 @@
             }
           },
           {
-            "id": "e319d2b48978cfd3",
+            "id": "3728318aeaa53439",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -151,11 +156,12 @@
             }
           },
           {
-            "id": "98165e177c331ffe",
+            "id": "f33d08313eb1f291",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
+                "file": "README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -182,52 +188,42 @@
       "bases:Create new base": false
     }
   },
-  "active": "be8f503fc7518c03",
+  "active": "95002c9308219005",
   "lastOpenFiles": [
-    "_Documentation/Technical/Livestream Integration/Proof of Concept.md",
+    "_Documentation/Data/Telemetry (Avionics - Radio Receiver (Serial)).md",
+    "_Documentation/Data/Video Capture (C.S - Serial).md",
+    "_Documentation/Data/Telemetry.md",
     "README.md",
-    "_Batch_Files/README.md",
-    "_Documentation/Images/livestream_flow_chart.png",
+    "Telemetry-Python-Webserver/README.md",
+    "_Documentation/Development Process/Setup.md",
+    "_Documentation/Development Process/Development Workflow.md",
+    "_Documentation/Development Process/Build Process.md",
+    "_Documentation/_Images/Pasted image 20260923153453.png",
+    "_Documentation/Development.md",
     "Untitled.base",
-    "Untitled 1.base",
-    "Main-Tauri-Application/src/telemetry-dashboard/components/Altimeter.jsx",
-    "Main-Tauri-Application/src/telemetry-dashboard/components/GaugeComponent copy.jsx",
-    "Main-Tauri-Application/src/telemetry-dashboard/simulator/GpsScene.css",
-    "Main-Tauri-Application/src/telemetry-dashboard/simulator/dashboard.css",
-    "Telemetry-Python-Webserver/test_data/test-flight-2026-March/GPS Altitude.csv",
-    "Telemetry-Python-Webserver/test_data/test-flight-2026-March/Barometric Altitude.csv",
-    "Telemetry-Python-Webserver/test_data/test-flight-2026-March",
-    "Telemetry-Python-Webserver/test_data/mygeodata.zip",
-    "Main-Tauri-Application/assets/map/launch_marker.png",
-    "Main-Tauri-Application/assets/map/apogee_marker.png",
-    "Main-Tauri-Application/assets/map/Apogee.png",
-    "Main-Tauri-Application/assets/map/Adobe Express - file.png",
-    "Main-Tauri-Application/assets/map/rocket_marker.png",
-    "Welcome.md",
-    "Serial-Tester/README.md",
-    "Main-Tauri-Application/node_modules/@mui/x-charts/README.md",
-    "Main-Tauri-Application/node_modules/@mui/x-charts/CHANGELOG.md",
-    "Main-Tauri-Application/node_modules/@mui/x-internals/node_modules/@mui/utils/CHANGELOG.md",
-    "Main-Tauri-Application/node_modules/flatqueue/README.md",
-    "Main-Tauri-Application/node_modules/path-parse/README.md",
-    "Main-Tauri-Application/node_modules/resolve-from/readme.md",
-    "Main-Tauri-Application/node_modules/@types/parse-json/README.md",
-    "Main-Tauri-Application/node_modules/@mui/private-theming/README.md",
-    "Main-Tauri-Application/node_modules/@mui/private-theming/CHANGELOG.md",
-    "Main-Tauri-Application/node_modules/@mui/styled-engine/CHANGELOG.md",
-    "Main-Tauri-Application/node_modules/react-transition-group/README.md",
-    "Main-Tauri-Application/node_modules/babel-plugin-macros/README.md",
-    "Main-Tauri-Application/node_modules/path-type/readme.md",
-    "Main-Tauri-Application/node_modules/json-parse-even-better-errors/README.md",
-    "Main-Tauri-Application/node_modules/json-parse-even-better-errors/LICENSE.md",
-    "Main-Tauri-Application/node_modules/json-parse-even-better-errors/CHANGELOG.md",
-    "Main-Tauri-Application/node_modules/supports-preserve-symlinks-flag/README.md",
-    "Main-Tauri-Application/node_modules/supports-preserve-symlinks-flag/CHANGELOG.md",
-    "Main-Tauri-Application/node_modules/callsites/readme.md",
-    "Main-Tauri-Application/node_modules/is-arrayish/README.md",
-    "_BUILD/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/f2cc2d6163d3bb3581dc97f0eea279e4d3bb2f50102892e5f5f98903f75de3dc.png",
-    "_BUILD/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/eb5ea8d87d450bf76632793c6692d569f407382813fc157921174eded7dc4965.png",
-    "_BUILD/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/e63ab81f80838701f0259826730711f7deb9f10731d7139d0074f151c50e702d.png",
-    "_BUILD/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/ad86ebbda98ab7e0b9081b670a0efbbbbdf83763d9d0104b6bba69305022e762.jpg"
+    "_Documentation/_Images/Pasted image 20260923151603.png",
+    "_Documentation/Data",
+    "_Documentation/Development/Build_Process.md",
+    "_Documentation/Development/Build.md",
+    "_Documentation/README.md",
+    "Main-Tauri-Application/src-tauri/target/debug/rocketview.d",
+    "Main-Tauri-Application/src-tauri/target/debug/librocketview_lib.d",
+    "Main-Tauri-Application/src-tauri/target/debug/rocketview_lib.d",
+    "Main-Tauri-Application/src-tauri/target/debug/rocketview.pdb",
+    "Main-Tauri-Application/src-tauri/target/debug/rocketview.exe",
+    "Main-Tauri-Application/src-tauri/target/debug/deps/rocketview.pdb",
+    "Main-Tauri-Application/src-tauri/target/debug/deps/rocketview.exe",
+    "Main-Tauri-Application/src-tauri/target/debug/deps/rocketview.em8c75sefa0hk2t4cin9rehjf.0as4gt0.rcgu.o",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/f2cc2d6163d3bb3581dc97f0eea279e4d3bb2f50102892e5f5f98903f75de3dc.png",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/ad86ebbda98ab7e0b9081b670a0efbbbbdf83763d9d0104b6bba69305022e762.jpg",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/6852ec4035216c29df6ee6998040224babc866069039a04f2bdbac0436cdb2d4.png",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/e63ab81f80838701f0259826730711f7deb9f10731d7139d0074f151c50e702d.png",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/27024089c2a9793e5f0cbdf827236e34c45ac3d014858bd9f4963fb9799f0c39.png",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/ecb0edc2c48b24d99f9742d01db145785589ec27fd0f92d8b8842860e774ddd1.png",
+    "Main-Tauri-Application/src-tauri/target/release/build/rocketview-5387f0a905edfe1c/out/tauri-codegen-assets/b24991575a20ff689fe18754104a7b5182cbac657217e7c0104bf6537b6b3d23.png",
+    "Main-Tauri-Application/dist/assets/rocket_marker-Di17RyGz.png",
+    "_Documentation/Raw Requirements and Specification.md",
+    "_Documentation/Technical/Common/Database and Other Storage/README.md",
+    "_Documentation/Technical/Common/Build Process/README.md"
   ]
 }

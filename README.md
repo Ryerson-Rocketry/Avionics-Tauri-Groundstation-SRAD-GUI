@@ -11,8 +11,8 @@
   <p align="center">
      Custom SRAD GUI for 2025-2027
     <br />
-    <a href="https://github.com/TBA/TBA/tree/main/_Documentation"><strong>See Main Documentation »</strong></a>
-    <a href="https://github.com/TBA/TBA/tree/main/_Documentation"><strong>See User Manual »</strong></a>
+    <a href="https://github.com/TBA/TBA/tree/main/_Documentation/Development Process"><strong>See development guides »</strong></a>
+    <a href=""><strong>See User Manual - TODO»</strong></a>
     <br />
   </p>
 </div>
@@ -31,7 +31,7 @@
   </ol>
 </details>
 
-Updated (2026-09-20)
+Updated (2026-09-23)
 
 # Overview
 
@@ -44,11 +44,17 @@ TODO NEW IMG
 ### Purpose
 Desktop application specifically for displaying both raw and parsed telemetry data transmitted from Avionics' specific onboard firmware. Overall application comprises the Tauri built application as well as a Python webserver for receiving data from a connected radio.
 
+For 2026-2027. An addition feature is to be supported via a livestream transmission and display from Control Systems.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 # To be worked on current Academic year (2026-2027)
 
-(will organize into proper task sheet later)
+## Overview
+Unlike previous years, Avionics plans to reuse the current GUI iteration for the coming academic year instead of recycling and making a new one. See below for ongoing tasks
+
+## Tasks
+Task Sheet (Shamelessly stolen from C.S) - https://docs.google.com/spreadsheets/d/1cC-NFa0TjCU6dJpKvGlP5aalaOVjuACsKSH2E4eWsXQ/edit?usp=sharing
 
 Unlike previous years, Avionics plans to reuse the current GUI iteration foe the coming academic year instead of recycling and making a new one. The following is a tentative list of improvements to be done:
 
@@ -69,30 +75,6 @@ Unlike previous years, Avionics plans to reuse the current GUI iteration foe the
 	- Performance (ex. currently 3D map + graphs do not perform well when rendering large number of data points ( < 2ish mins of launch data))
 
 # Telemetry 
-
-To provide data to the GUI, a Python Webserver with serial port access is used (a connected radio receiver should be used in conjunction with this). At this time only hardcoded data that is required is supported
-- Note: Will include custom data mapping (via a specified schema) later
-
-General Flow is from CSV string received from the Webserver which is then parsed into a JSON object for use in the GUI itself. The CSV string can be parsed either using headers received from radio or on a positional basis (via. position of element in csv string)
-
-## Supported Telemetry Data
-### Hardcoded Data
-
-| Data            | Radio (Header/Position) -> Webserver JSON Mapping | Webserver -> Tauri JSON Mapping | Data Type | Data Vis                  |
-| --------------- | ------------------------------------------------- | ------------------------------- | --------- | ------------------------- |
-| Latitude        | latitude -> x                                     |                                 | Number    | 2D Map                    |
-| Longitude       | longitude -> z                                    |                                 | Number    | 2D Map                    |
-| Altitude        | altitude -> y                                     |                                 | Number    | 2D Map<br>3D Map<br>Graph |
-| Pressure        | pressure ->                                       |                                 | Number    | Text<br>Graph             |
-| Temperature     | temperature -> temp                               |                                 | Number    | Text<br>Graph             |
-| Battery Voltage | battery_voltage -> battVolt                       |                                 | Number    | Text                      |
-| Main Voltage    | main_voltage -> mainVolt                          |                                 | Number    | Text                      |
-| Drogue Voltage  | drogue_voltage -> drogVolt                        |                                 | Number    | Text                      |
-| Velocity        | speed -> vel                                      |                                 | Number    | Text<br>Graph             |
-| Acceleration    | acceleration -> acceleration                      |                                 | Number    | Text<br>Graph             |
-| State           | state_name -> state                               |                                 | String    | Text                      |
-| Time            | time -> timestamp                                 |                                 | Number    | Graph                     |
-| Pitch/Roll/Yaw  |                                                   |                                 | Vector3   | 3D Map<br>Text            |
 
 ## Telemetry Data Display Modules
 
@@ -131,25 +113,27 @@ General Flow is from CSV string received from the Webserver which is then parsed
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 # Getting Started (Development)
+Not
 
-### Requirements  
-- Cargo (Rust package manager)
-- Python
-- Git
+## Setup Guide
+Full setup (everything from package manager setups to actual project setup): [Documentation (Link to Markdown README in Documentation Folder)](<Documentation/Development Process/Setup.md)
 
-### Components
+## Development Guide
+Guide for actually working with the project: [Documentation (Link to Markdown README in Documentation Folder)](<Documentation/Development Process/Development Workflow.md>)
 
-### Installation (Windows 10/11)
+## Build Process
+There are three ways of building the application, either manually, using batch files, or using Github Actions to build it on their servers. All three methods are outlined [in this document](<Documentation/Development Process/Build Process.md>)
+- (SEPT 2026) - Note doc isn't done will be more fleshed out later
 
-TBD 
+## Contribution Guidelines
+- Ask for work on tasksheet - (https://docs.google.com/spreadsheets/d/1cC-NFa0TjCU6dJpKvGlP5aalaOVjuACsKSH2E4eWsXQ/edit?usp=sharing)
+- When given it, make a branch on the repo
+- You can commit to branch whenever you want
+- When task is finished, make a pull request (PR) and ask for it to be reviewed on the Discord chat
+- Branch will be kept up or deleted after as needed
 
-For more detailed instructions, see [Documentation (Link to Markdown README in Documentation Folder)](_Documentation/README.md)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Build Process (Via Github actions)
-- 
 
 
 # Documentation

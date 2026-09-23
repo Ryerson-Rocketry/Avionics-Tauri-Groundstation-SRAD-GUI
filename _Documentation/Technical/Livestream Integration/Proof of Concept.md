@@ -51,7 +51,7 @@ when transmitting data from from capture card, we cannot simply just send raw by
 
 ### Overall implementation
 
-![](../../Images/livestream_flow_chart.png)
+![](../../_Images/livestream_flow_chart.png)
 
 - When frontend launches dashboard and switches to livestream view, we open a new websocket to python webserver
 - Webserver launches a FFmpeg process that captures data from a video source, converts to fmp4, and outputs to STDOUT
