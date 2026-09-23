@@ -1,7 +1,7 @@
 REM PYTHON STUFF ----------------------
 
 REM Package Python Build (Also renames file according to what tauri wants (name-target_platform))
-cd ../Telemetry-Python-Webserver
+cd ../../Telemetry-Python-Webserver
 
 cd .venv/Scripts
 call activate.bat
@@ -17,15 +17,3 @@ REM Place build in tauri src folder (tauri itself will automatically include thi
 cd dist
 copy ".\webserver_proc-x86_64-pc-windows-msvc.exe" ".\../../Main-Tauri-Application/src-tauri/binaries"
 
-REM TAURI STUFF------------------------
-
-cd ../../Main-Tauri-Application
-call npm run tauri build
-
-REM  e = subdirectories as well, y = overwrite all, echo D| ensure it is copying to directory
-
-echo D|xcopy ".\src-tauri\target\release" ".\../_BUILD/" /e /y
-
-
-
-pause
