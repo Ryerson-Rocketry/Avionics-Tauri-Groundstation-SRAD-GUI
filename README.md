@@ -11,7 +11,7 @@
   <p align="center">
      Custom SRAD GUI for 2025-2027
     <br />
-    <a href="https://github.com/TBA/TBA/tree/main/_Documentation/Development Process"><strong>See development guides »</strong></a>
+    <a href="https://github.com/Ryerson-Rocketry/Avionics-Tauri-Groundstation-SRAD-GUI/tree/main/_Documentation/Development%20Process"><strong>See development guides »</strong></a>
     <a href=""><strong>See User Manual - TODO»</strong></a>
     <br />
   </p>
@@ -117,13 +117,13 @@ Unlike previous years, Avionics plans to reuse the current GUI iteration foe the
 Not
 
 ## Setup Guide
-Full setup (everything from package manager setups to actual project setup): [Documentation (Link to Markdown README in Documentation Folder)](<Documentation/Development Process/Setup.md)
+Full setup (everything from package manager setups to actual project setup): [Documentation (Link to Markdown README in Documentation Folder)](<_Documentation/Development Process/Setup.md>)
 
 ## Development Guide
-Guide for actually working with the project: [Documentation (Link to Markdown README in Documentation Folder)](<Documentation/Development Process/Development Workflow.md>)
+Guide for actually working with the project: [Documentation (Link to Markdown README in Documentation Folder)](<_Documentation/Development Process/Development Workflow.md>)
 
 ## Build Process
-There are three ways of building the application, either manually, using batch files, or using Github Actions to build it on their servers. All three methods are outlined [in this document](<Documentation/Development Process/Build Process.md>)
+There are three ways of building the application, either manually, using batch files, or using Github Actions to build it on their servers. All three methods are outlined [in this document](<_Documentation/Development Process/Build Process.md>)
 - (SEPT 2026) - Note doc isn't done will be more fleshed out later
 
 ## Contribution Guidelines
