@@ -140,6 +140,50 @@ async def radio_handler(websocket):
 """
 
 
+# ---------- PACKET PARSING HELPERS (look up values by label instead of line position) ----------
+NUMBER_PATTERN = re.compile(r"-?\d+(?:\.\d+)?")
+
+def packet_to_fields(packet):
+    """Turn ["Battery: 41.81 V", ...] into {"Battery": "41.81 V", ...}"""
+    fields = {}
+    for line in packet:
+        key, _, value = line.partition(":")
+        fields[key.strip()] = value.strip()
+    return fields
+
+def get_text(fields, label, default=""):
+    """For fields that are text, like Callsign and Status."""
+    value = fields.get(label)
+    if value is None:
+        print("WARN: missing field '" + label + "', using default: " + str(default), flush = True)
+        return default
+    return value
+
+def get_number(fields, label, default=0.0):
+    """For one number, like '41.81 V' -> 41.81"""
+    value = fields.get(label)
+    if value is None:
+        print("WARN: missing field '" + label + "', using default: " + str(default), flush = True)
+        return default
+    match = NUMBER_PATTERN.search(value)
+    if match is None:
+        print("WARN: no number found in '" + label + "', using default: " + str(default), flush = True)
+        return default
+    return float(match.group())
+
+def get_numbers(fields, label, count, default=0.0):
+    """For lines with several numbers, like 'Accel X/Y/Z: 8.10, 0.99, -7.85 g' -> [8.10, 0.99, -7.85]"""
+    value = fields.get(label)
+    if value is None:
+        print("WARN: missing field '" + label + "', using default: " + str(default), flush = True)
+        return [default] * count
+    found = NUMBER_PATTERN.findall(value)
+    if len(found) < count:
+        print("WARN: expected " + str(count) + " numbers in '" + label + "', using default: " + str(default), flush = True)
+        return [default] * count
+    return [float(n) for n in found[:count]]
+# ---------------------------------------------------------------------------------------------
+
 #Assumed format of main data string: timestamp [0], x [1], y [2], z [3], battVolt [4], temp [5], press [6], speed [7], acceleration [8]
 async def radio_handler(websocket):
     print ("INFO: ATTEMPTING CONNECTION, WILL SHOW MESSAGE IF CONNECTED", flush = True)
@@ -168,11 +212,7 @@ async def radio_handler(websocket):
                     
                 
                 if "------------------------------------------------" in str_line and not (len(packet) == 0):
-                    if (len(packet) == 14): #ONLY ACCEPT IF THE       
-                        full_packet_recieved = True
-                    else:
-                        print ("INFO: IRREGULAR PACKET LENGTH FOUND (NOT 14 LINES); REJECTING PACKET; DELETING PACKET, WILL TRY AGAIN", flush = True)
-                        packet = []
+                    full_packet_recieved = True
 
                 #ignore if it is the very first shit
                 elif "------------------------------------------------" in str_line and (len(packet) == 0):
@@ -210,67 +250,22 @@ async def radio_handler(websocket):
             #print ("FULL PACKET RECIEVED: NOW PARSING packet length of: " + str(len(packet)), flush = True)
             
 
-            # REPLACE LATER WITH FOR LOOPS BRAH, ACTUALLY RETARDED
-            callsign = packet[0].split(": ")
-            callsign = callsign[1]
-            #print ("callsign: " + callsign)
+            fields = packet_to_fields(packet)
 
-            timestamp = packet[1].split(": ")
-            timestamp = timestamp[1]
-            #print ("timestamp: " + timestamp)
-
-            battery = packet[2].split(" ")
-            battery = battery[1]
-            #print ("battery: " + battery)
-
-            accel_array = packet[3].split(":")
-            accel_array = accel_array[1].split(", ")
-            accel_array[0] = re.sub('[^0-9,.,-]', '', accel_array[0])
-            accel_array[1] = re.sub('[^0-9,.,-]', '', accel_array[1])
-            accel_array[2] = re.sub('[^0-9,.,-]', '', accel_array[2])
-            #print ("accel x/y/z: " +  str(accel_array[0]) + " " +  (accel_array[1]) + " " + (accel_array[2]))
-
-            gyro_array = packet[4].split(":")
-            gyro_array = gyro_array[1].split(", ")
-            gyro_array[0] = re.sub('[^0-9,.,-]', '', gyro_array[0])
-            gyro_array[1] = re.sub('[^0-9,.,-]', '', gyro_array[1])
-            gyro_array[2] = re.sub('[^0-9,.,-]', '', gyro_array[2])
-            #print ("gyro x/y/z: " +  str(gyro_array[0]) + " " +  (gyro_array[1]) + " " + (gyro_array[2]))
-
-            temp = packet[5].split(" ")
-            temp = temp[1]
-            #print ("temp: " + temp)
-
-            pressure = packet[6].split(" ")
-            pressure = pressure[1]
-            #print ("pressure: " + pressure)
-
-            altitude = packet[7].split(" ")
-            altitude = altitude[1]
-            #print ("altitude: " + altitude)
-
-            lat = packet[8].split(" ")
-            lat = lat[1]
-            #print ("lat: " + lat)
-            long = packet[9].split(" ")
-            long = long[1]
-            #print ("long: " + long)
-
-            status = packet[10].split(" ")
-            status = status[1]
-            #print ("status: " + status)
-
-            rssi = packet[11].split(" ")
-            rssi = rssi[1]
-            #print ("rssi: " + rssi)
-
-            snr = packet[12].split(" ")
-            snr = rssi[1]
-            #print ("snr: " + snr)
-
-            freq_err = packet[13].split(" ")
-            freq_err = rssi[1]
-            #print ("freq_err: " + freq_err)
+            callsign = get_text(fields, "Callsign", "NA")
+            timestamp = get_number(fields, "Packet #")      # old code also used the Packet # line as "timestamp"
+            battery = get_number(fields, "Battery")
+            accel_array = get_numbers(fields, "Accel X/Y/Z", 3)
+            gyro_array = get_numbers(fields, "Gyro X/Y/Z", 3)
+            temp = get_number(fields, "Temp")
+            pressure = get_number(fields, "Pressure")
+            altitude = get_number(fields, "Altitude")
+            lat = get_number(fields, "Latitude")
+            long = get_number(fields, "Longitude")
+            status = get_text(fields, "Status", "0x00000000")
+            rssi = get_number(fields, "RSSI")
+            snr = get_number(fields, "SNR")
+            freq_err = get_number(fields, "Freq Error")
 
             data = {
                 "timestamp": float(timestamp),
